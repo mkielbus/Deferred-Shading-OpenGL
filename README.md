@@ -2,7 +2,7 @@
 
 ## Instalacja potrzebnych bibliotek
 
-- sudo apt install -y libglfw3-dev libglew-dev libgl-dev
+- sudo apt install -y libglfw3-dev libglew-dev libgl-dev libglm-dev
 
 ## Kompilacja projektu
 
@@ -14,4 +14,4 @@
 ## Uruchomienie projektu
 
 1. cd buildDir
-2. ./gkom24
+2. ./gkom24l
