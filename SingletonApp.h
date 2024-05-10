@@ -18,8 +18,9 @@ private:
   glm::vec2 window_resolution;
   ShadersConf conf;
   std::vector<Vertex> prepareTriangles();
-  void prepareVbo(const std::vector<Vertex> &buffer);
-  void prepareVao();
+  std::vector<Vertex> prepareCircles(std::vector<Vertex> &&buffer);
+  void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
+  void prepareVao(GLuint &vao);
 
 public:
   SingletonApp(

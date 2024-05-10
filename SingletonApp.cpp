@@ -1,5 +1,6 @@
 #include "SingletonApp.h"
 #include <iostream>
+#include <cmath>
 #include "Data.hpp"
 
 SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolution(glm::vec2(800, 600)), conf() {}
@@ -8,6 +9,11 @@ SingletonApp &SingletonApp::getInstance()
 {
   static SingletonApp app;
   return app;
+}
+
+void FrameBufferSizeChangeCallbackFunction(GLFWwindow *window, int width, int height)
+{
+  glViewport(0, 0, width, height);
 }
 
 bool SingletonApp::prepareWindow()
@@ -42,6 +48,9 @@ bool SingletonApp::prepareWindow()
     glfwTerminate();
     return false;
   }
+
+  glfwSetFramebufferSizeCallback(this->window, FrameBufferSizeChangeCallbackFunction);
+
   return true;
 }
 
@@ -53,35 +62,55 @@ std::vector<Vertex> SingletonApp::prepareTriangles()
   std::vector<glm::vec3> colors = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
-  std::vector<Vertex> vertexes_blue = {{positions[0], colors[0]}, {positions[1], colors[1]}, {positions[2], colors[2]}};
-  std::vector<Vertex> vertexes_red = {{positions[3], colors[3]}, {positions[4], colors[4]}, {positions[5], colors[5]}};
-  std::vector<Vertex> vertexes_green = {{positions[6], colors[6]}, {positions[7], colors[7]}, {positions[8], colors[8]}};
-  Triangle triangles[3];
-  triangles[0] = Triangle(vertexes_blue);
-  triangles[1] = Triangle(vertexes_red);
-  triangles[2] = Triangle(vertexes_green);
   std::vector<Vertex> buffer;
-  for (size_t i = 0; i < 3; i++)
+  for (size_t i = 0; i < 9; i++)
   {
-    buffer.push_back({triangles[i].vertexes[0]});
-    buffer.push_back({triangles[i].vertexes[1]});
-    buffer.push_back({triangles[i].vertexes[2]});
+    buffer.push_back(Vertex(positions[i], colors[i]));
   }
   return buffer;
 }
 
-void SingletonApp::prepareVbo(const std::vector<Vertex> &buffer)
+std::vector<Vertex> SingletonApp::prepareCircles(std::vector<Vertex> &&buffer)
 {
-  glGenBuffers(1, &this->vbo);
 
-  glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+  glm::vec3 circleMiddle = glm::vec3(0.0f, 0.0f, 0.0f);
+
+  std::vector<glm::vec3> positions;
+
+  positions.push_back(circleMiddle);
+
+  unsigned int segments = 50;
+
+  for (unsigned int i = 0; i <= segments; i++)
+  {
+    float phi = float(i) / segments * 2.0f * (float)M_PI;
+
+    float x = circleMiddle.x + 0.2f * std::cos(phi);
+    float y = circleMiddle.y + 0.2f * std::sin(phi);
+    float z = 0.0f;
+
+    positions.push_back(glm::vec3(x, y, z));
+  }
+
+  for (size_t i = 0; i < positions.size(); i++)
+  {
+    buffer.push_back({positions[i], glm::vec3(1.0f, 1.0f, 1.0f)});
+  }
+  return buffer;
+}
+
+void SingletonApp::prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo)
+{
+  glGenBuffers(1, &vbo);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * buffer.size(), buffer.data(), GL_STATIC_DRAW);
 }
 
-void SingletonApp::prepareVao()
+void SingletonApp::prepareVao(GLuint &vao)
 {
-  glGenVertexArrays(1, &this->vao);
-  glBindVertexArray(this->vao);
+  glGenVertexArrays(1, &vao);
+  glBindVertexArray(vao);
   glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)0);
   glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void *)(sizeof(glm::vec3)));
   glEnableVertexAttribArray(0);
@@ -100,6 +129,7 @@ void SingletonApp::execute()
     // Narysuj trójkąty
     glBindVertexArray(this->vao);
     glDrawArrays(GL_TRIANGLES, 0, 9);
+    glDrawArrays(GL_TRIANGLE_FAN, 9, 59);
     glBindVertexArray(0);
     this->conf.disable();
     // Sprawdź zdarzenia i zamień bufory
@@ -116,8 +146,8 @@ bool SingletonApp::prepareScene()
   {
     return false;
   }
-  this->prepareVbo(this->prepareTriangles());
-  this->prepareVao();
+  this->prepareVbo(this->prepareCircles(this->prepareTriangles()), this->vbo);
+  this->prepareVao(this->vao);
   return true;
 }
 

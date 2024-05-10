@@ -37,27 +37,4 @@ struct Vertex
     ~Vertex() = default;
 };
 
-struct Triangle
-{
-    Vertex vertexes[3];
-    Triangle()
-    {
-        unsigned int iterator = 0;
-        for (iterator; iterator < 3; iterator++)
-        {
-            this->vertexes[iterator] = Vertex();
-        }
-    }
-    Triangle(std::vector<Vertex> vertexes)
-    {
-        unsigned int iterator = 0;
-        for (const Vertex &other_vertex : vertexes)
-        {
-            this->vertexes[iterator] = other_vertex;
-            iterator++;
-        }
-    }
-    ~Triangle() = default;
-};
-
 #endif
