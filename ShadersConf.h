@@ -21,6 +21,7 @@ public:
     GLuint getUniformVarId(std::string uniform_var_name) const;
     bool init();
     ShadersConf();
+    ShadersConf(std::string vertex_shader_template, std::string fragment_shader_template);
     ~ShadersConf() = default;
     ShadersConf(const ShadersConf &) = delete;
     ShadersConf &operator=(const ShadersConf &) = delete;

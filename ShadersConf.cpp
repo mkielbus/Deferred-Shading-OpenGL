@@ -18,6 +18,10 @@ ShadersConf::ShadersConf() : vertex_shader_template("#version 130\n"
 {
 }
 
+ShadersConf::ShadersConf(std::string vertex_shader_template, std::string fragment_shader_template) : vertex_shader_template(vertex_shader_template), fragment_shader_template(fragment_shader_template), conf_id(0)
+{
+}
+
 GLuint ShadersConf::getConfId() const
 {
     return this->conf_id;

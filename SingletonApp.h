@@ -15,12 +15,25 @@ private:
   GLFWwindow *window;
   GLuint vao;
   GLuint vbo;
+  GLuint eab;
   glm::vec2 window_resolution;
   ShadersConf conf;
+  ShadersConf texture_conf;
+  GLuint texture;
+  float fieldOfView;
+  glm::mat4 projectionMatrix;
+  glm::mat4 viewMatrix;
+  glm::vec3 cameraPosition;
+  glm::vec3 cameraDirection;
+  glm::vec3 cameraUp;
+  float cameraSpeed;
   std::vector<Vertex> prepareTriangles();
   std::vector<Vertex> prepareCircles(std::vector<Vertex> &&buffer);
   void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
   void prepareVao(GLuint &vao);
+  void prepareEab(GLuint &eab);
+  void processInput();
+  void prepareTexture(GLuint &texture, std::string filepath, GLint paramWrapS, GLint paramWrapT, GLint paramMinFilter, GLuint paramMagFilter);
 
 public:
   SingletonApp(
