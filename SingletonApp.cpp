@@ -13,10 +13,11 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                                                                                                  std::string("out vec3 fragColor;\n") +
                                                                                                                  std::string("uniform mat4 uProjectionMatrix;\n") +
                                                                                                                  std::string("uniform mat4 uViewMatrix;\n") +
+                                                                                                                 std::string("uniform mat4 uModelMatrix;\n") +
                                                                                                                  std::string("void main()\n") +
                                                                                                                  std::string("{\n") +
                                                                                                                  std::string("    fragColor = attrColor;\n") +
-                                                                                                                 std::string("    gl_Position = uProjectionMatrix * uViewMatrix * vec4(attrPosition, 1.0);\n") +
+                                                                                                                 std::string("    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(attrPosition, 1.0);\n") +
                                                                                                                  std::string("}\n"),
                                                                                                              std::string("#version 330\n") +
                                                                                                                  std::string("in vec3 fragColor;\n") +
@@ -30,11 +31,12 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                                 std::string("out vec2 texCoord;\n") +
                                                 std::string("uniform mat4 uProjectionMatrix;\n") +
                                                 std::string("uniform mat4 uViewMatrix;\n") +
+                                                std::string("uniform mat4 uModelMatrix;\n") +
                                                 std::string("uniform sampler2D uTexture;\n") +
                                                 std::string("void main()\n") +
                                                 std::string("{\n") +
                                                 std::string("    texCoord = attrTexCoord;\n") +
-                                                std::string("    gl_Position = uProjectionMatrix * uViewMatrix * vec4(attrPosition, 1.0);\n") +
+                                                std::string("    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(attrPosition, 1.0);\n") +
                                                 std::string("}\n"),
                                             std::string("#version 330\n") +
                                                 std::string("in vec2 texCoord;\n") +
@@ -102,7 +104,7 @@ bool SingletonApp::prepareWindow()
   return true;
 }
 
-void SingletonApp::prepareBorders(std::vector<Vertex> &buffer)
+void SingletonApp::prepareCuboid(std::vector<Vertex> &buffer)
 {
   std::vector<glm::vec3> positions = {glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f),
                                       glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f),
@@ -160,9 +162,9 @@ void SingletonApp::prepareBorders(std::vector<Vertex> &buffer)
 
 void SingletonApp::prepareTriangles(std::vector<Vertex> &buffer)
 {
-  std::vector<glm::vec3> positions = {glm::vec3(-0.99f, 0.0f, 0.0f), glm::vec3(-0.7f, -0.5f, 0.0f), glm::vec3(-0.7f, 0.5f, 0.0f),
-                                      glm::vec3(0.99f, 0.0f, 0.0f), glm::vec3(0.7f, -0.5f, 0.0f), glm::vec3(0.7f, 0.5f, 0.0f),
-                                      glm::vec3(-0.7f, 0.5f, 0.0f), glm::vec3(0.7f, 0.5f, 0.0f), glm::vec3(0.0f, 0.8f, 0.0f)};
+  std::vector<glm::vec3> positions = {glm::vec3(-0.99f, 0.0f, 0.01f), glm::vec3(-0.7f, -0.5f, 0.01f), glm::vec3(-0.7f, 0.5f, 0.01f),
+                                      glm::vec3(0.99f, 0.0f, 0.01f), glm::vec3(0.7f, -0.5f, 0.01f), glm::vec3(0.7f, 0.5f, 0.01f),
+                                      glm::vec3(-0.7f, 0.5f, 0.01f), glm::vec3(0.7f, 0.5f, 0.01f), glm::vec3(0.0f, 0.8f, 0.01f)};
   std::vector<glm::vec3> colors = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
@@ -178,7 +180,7 @@ void SingletonApp::prepareTriangles(std::vector<Vertex> &buffer)
   }
 }
 
-void SingletonApp::prepareCircles(std::vector<Vertex> &buffer)
+void SingletonApp::prepareCircle(std::vector<Vertex> &buffer)
 {
   glm::vec3 circleMiddle = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -194,7 +196,7 @@ void SingletonApp::prepareCircles(std::vector<Vertex> &buffer)
 
     float x = circleMiddle.x + 0.2f * std::cos(phi);
     float y = circleMiddle.y + 0.2f * std::sin(phi);
-    float z = 0.0f;
+    float z = 0.01f;
 
     positions.push_back(glm::vec3(x, y, z));
   }
@@ -329,13 +331,16 @@ void SingletonApp::execute()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     projectionMatrix = glm::perspective(glm::radians(fieldOfView), this->window_resolution.x / this->window_resolution.y, 0.1f, 100.0f);
     viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
+    modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     this->conf.enable();
     glUniformMatrix4fv(this->conf.getUniformVarId("uViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(this->conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     this->conf.disable();
     this->texture_conf.enable();
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniform1i(this->texture_conf.getUniformVarId("uTexture"), 0);
     glBindVertexArray(this->vao);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eab);
@@ -352,6 +357,34 @@ void SingletonApp::execute()
     glBindTexture(GL_TEXTURE_2D, 0);
     this->texture_conf.disable();
     this->conf.enable();
+    for (int i = -10; i <= 10; i = i + 10)
+    {
+      for (int j = 0; j <= 10; j = j + 10)
+      {
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));   // Rotate 90 degrees around Z axis
+        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f)); // Scale down by 20 times
+        modelMatrix = model;
+        glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f + i, -1.0f + j, 2.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));   // Rotate 90 degrees around Z axis
+        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f)); // Scale down by 20 times
+        modelMatrix = model;
+        glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f + i, 0.0f + j, 4.0f));
+        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f)); // Scale down by 20 times
+        modelMatrix = model;
+        glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+      }
+    }
+    modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glDrawArrays(GL_TRIANGLES, 36, 6);
     this->conf.disable();
     this->texture_conf.enable();
@@ -446,9 +479,9 @@ bool SingletonApp::prepareScene()
     return false;
   }
   std::vector<Vertex> buffer;
-  this->prepareBorders(buffer);
+  this->prepareCuboid(buffer);
   this->prepareTriangles(buffer);
-  this->prepareCircles(buffer);
+  this->prepareCircle(buffer);
   this->prepareVbo(buffer, this->vbo);
   this->prepareVao(this->vao);
   this->prepareEab(this->eab);

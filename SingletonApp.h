@@ -26,13 +26,14 @@ private:
   float fieldOfView;
   glm::mat4 projectionMatrix;
   glm::mat4 viewMatrix;
+  glm::mat4 modelMatrix;
   glm::vec3 cameraPosition;
   glm::vec3 cameraDirection;
   glm::vec3 cameraUp;
   float cameraSpeed;
-  void prepareBorders(std::vector<Vertex> &buffer);
+  void prepareCuboid(std::vector<Vertex> &buffer);
   void prepareTriangles(std::vector<Vertex> &buffer);
-  void prepareCircles(std::vector<Vertex> &buffer);
+  void prepareCircle(std::vector<Vertex> &buffer);
   void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
   void prepareVao(GLuint &vao);
   void prepareEab(GLuint &eab);
