@@ -20,6 +20,9 @@ private:
   ShadersConf conf;
   ShadersConf texture_conf;
   GLuint texture;
+  GLuint texture_floor;
+  GLuint texture_wall;
+  GLuint texture_ceiling;
   float fieldOfView;
   glm::mat4 projectionMatrix;
   glm::mat4 viewMatrix;
@@ -27,8 +30,9 @@ private:
   glm::vec3 cameraDirection;
   glm::vec3 cameraUp;
   float cameraSpeed;
-  std::vector<Vertex> prepareTriangles();
-  std::vector<Vertex> prepareCircles(std::vector<Vertex> &&buffer);
+  void prepareBorders(std::vector<Vertex> &buffer);
+  void prepareTriangles(std::vector<Vertex> &buffer);
+  void prepareCircles(std::vector<Vertex> &buffer);
   void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
   void prepareVao(GLuint &vao);
   void prepareEab(GLuint &eab);

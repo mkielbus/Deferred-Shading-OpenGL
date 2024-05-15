@@ -46,7 +46,7 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                                 std::string("}\n"))
 {
   fieldOfView = 45;
-  cameraPosition = glm::vec3(0, 0, 20);
+  cameraPosition = glm::vec3(0, 0, 19);
   cameraDirection = glm::vec3(0, 0, -1);
   cameraUp = glm::vec3(0, 1, 0);
   cameraSpeed = 0.05f;
@@ -102,7 +102,63 @@ bool SingletonApp::prepareWindow()
   return true;
 }
 
-std::vector<Vertex> SingletonApp::prepareTriangles()
+void SingletonApp::prepareBorders(std::vector<Vertex> &buffer)
+{
+  std::vector<glm::vec3> positions = {glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f),
+                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f),
+                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 20.0f),
+                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(20.0f, -20.0f, 20.0f),
+                                      glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(-20.0f, 20.0f, 20.0f),
+                                      glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(20.0f, -20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f)};
+  std::vector<glm::vec3> colors = {glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
+                                   glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f)};
+  std::vector<glm::vec3> normals = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                                    glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                                    glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f)};
+  std::vector<glm::vec2> tex2d_coords = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
+                                         glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f)};
+  for (size_t i = 0; i < 36; i++)
+  {
+    buffer.push_back(Vertex(positions[i], colors[i], normals[i], tex2d_coords[i]));
+  }
+}
+
+void SingletonApp::prepareTriangles(std::vector<Vertex> &buffer)
 {
   std::vector<glm::vec3> positions = {glm::vec3(-0.99f, 0.0f, 0.0f), glm::vec3(-0.7f, -0.5f, 0.0f), glm::vec3(-0.7f, 0.5f, 0.0f),
                                       glm::vec3(0.99f, 0.0f, 0.0f), glm::vec3(0.7f, -0.5f, 0.0f), glm::vec3(0.7f, 0.5f, 0.0f),
@@ -116,15 +172,13 @@ std::vector<Vertex> SingletonApp::prepareTriangles()
   std::vector<glm::vec2> tex2d_coords = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f),
                                          glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f),
                                          glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f)};
-  std::vector<Vertex> buffer;
   for (size_t i = 0; i < 9; i++)
   {
     buffer.push_back(Vertex(positions[i], colors[i], normals[i], tex2d_coords[i]));
   }
-  return buffer;
 }
 
-std::vector<Vertex> SingletonApp::prepareCircles(std::vector<Vertex> &&buffer)
+void SingletonApp::prepareCircles(std::vector<Vertex> &buffer)
 {
   glm::vec3 circleMiddle = glm::vec3(0.0f, 0.0f, 0.0f);
 
@@ -149,7 +203,6 @@ std::vector<Vertex> SingletonApp::prepareCircles(std::vector<Vertex> &&buffer)
   {
     buffer.push_back(Vertex(positions[i], glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
   }
-  return buffer;
 }
 
 void SingletonApp::prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo)
@@ -178,15 +231,18 @@ void SingletonApp::prepareVao(GLuint &vao)
 void SingletonApp::prepareEab(GLuint &eab)
 {
   std::vector<GLshort> vertex_queue;
-  vertex_queue.push_back(6);
-  vertex_queue.push_back(7);
-  vertex_queue.push_back(8);
   vertex_queue.push_back(0);
   vertex_queue.push_back(1);
   vertex_queue.push_back(2);
   vertex_queue.push_back(3);
   vertex_queue.push_back(4);
   vertex_queue.push_back(5);
+  vertex_queue.push_back(6);
+  vertex_queue.push_back(7);
+  vertex_queue.push_back(8);
+  vertex_queue.push_back(9);
+  vertex_queue.push_back(10);
+  vertex_queue.push_back(11);
   glGenBuffers(1, &eab);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eab);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertex_queue.size() * sizeof(GLshort), vertex_queue.data(), GL_STATIC_DRAW);
@@ -281,25 +337,34 @@ void SingletonApp::execute()
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniform1i(this->texture_conf.getUniformVarId("uTexture"), 0);
-    this->texture_conf.disable();
-    this->conf.enable();
     glBindVertexArray(this->vao);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eab);
-    // glDrawElements(GL_TRIANGLES, 9, GL_UNSIGNED_SHORT, 0);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    this->conf.disable();
-    this->texture_conf.enable();
+    // glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->texture);
-    glDrawArrays(GL_TRIANGLES, 6, 3);
+    glBindTexture(GL_TEXTURE_2D, this->texture_floor);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindTexture(GL_TEXTURE_2D, this->texture_wall);
+    glDrawArrays(GL_TRIANGLES, 6, 24);
+    glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
+    glDrawArrays(GL_TRIANGLES, 30, 6);
     glActiveTexture(0);
     glBindTexture(GL_TEXTURE_2D, 0);
     this->texture_conf.disable();
     this->conf.enable();
-    glDrawArrays(GL_TRIANGLE_FAN, 9, 59);
+    glDrawArrays(GL_TRIANGLES, 36, 6);
+    this->conf.disable();
+    this->texture_conf.enable();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, this->texture);
+    glDrawArrays(GL_TRIANGLES, 42, 3);
+    glActiveTexture(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    this->texture_conf.disable();
+    this->conf.enable();
+    glDrawArrays(GL_TRIANGLE_FAN, 45, 59);
     glBindVertexArray(0);
     this->conf.disable();
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     this->processInput();
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -380,10 +445,17 @@ bool SingletonApp::prepareScene()
   {
     return false;
   }
-  this->prepareVbo(this->prepareCircles(this->prepareTriangles()), this->vbo);
+  std::vector<Vertex> buffer;
+  this->prepareBorders(buffer);
+  this->prepareTriangles(buffer);
+  this->prepareCircles(buffer);
+  this->prepareVbo(buffer, this->vbo);
   this->prepareVao(this->vao);
   this->prepareEab(this->eab);
   this->prepareTexture(this->texture, "../resources/box.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  this->prepareTexture(this->texture_wall, "../resources/wall.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  this->prepareTexture(this->texture_floor, "../resources/floor.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  this->prepareTexture(this->texture_ceiling, "../resources/ceiling.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   return true;
 }
 
