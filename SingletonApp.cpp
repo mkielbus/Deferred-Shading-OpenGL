@@ -366,23 +366,23 @@ void SingletonApp::execute()
         glActiveTexture(GL_TEXTURE0);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));   // Rotate 90 degrees around Z axis
-        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f)); // Scale down by 20 times
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, -1.0f + j, 2.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));   // Rotate 90 degrees around Z axis
-        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f)); // Scale down by 20 times
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 0.0f + j, 4.0f));
-        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f)); // Scale down by 20 times
+        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
@@ -401,8 +401,8 @@ void SingletonApp::execute()
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, -10.0f - j * 0.001, 1.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate 90 degrees around Z axis
-        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));                       // Scale down by 20 times
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glDrawArrays(GL_TRIANGLE_FAN, 36, 52);
