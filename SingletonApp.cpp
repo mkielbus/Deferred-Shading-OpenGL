@@ -48,9 +48,9 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                                 std::string("}\n"))
 {
   fieldOfView = 45;
-  cameraPosition = glm::vec3(0, 0, 19);
-  cameraDirection = glm::vec3(0, 0, -1);
-  cameraUp = glm::vec3(0, 1, 0);
+  cameraPosition = glm::vec3(-19, 0, 10);
+  cameraDirection = glm::vec3(1, 0, 0);
+  cameraUp = glm::vec3(0, 0, 1);
   cameraSpeed = 0.05f;
 }
 
@@ -201,9 +201,13 @@ void SingletonApp::prepareCircle(std::vector<Vertex> &buffer)
     positions.push_back(glm::vec3(x, y, z));
   }
 
+  unsigned int iter = 0;
   for (size_t i = 0; i < positions.size(); i++)
   {
-    buffer.push_back(Vertex(positions[i], glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+    std::vector<glm::vec2> tex_coords = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f)};
+    buffer.push_back(Vertex(positions[i], glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), tex_coords[iter]));
+    iter += 1;
+    iter = iter % 3;
   }
 }
 
@@ -263,37 +267,37 @@ void SingletonApp::processInput()
   if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
   {
     // Move forward
-    cameraPosition.z -= cameraSpeed;
+    cameraPosition.x += cameraSpeed;
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
   {
     // Move backward
-    cameraPosition.z += cameraSpeed;
+    cameraPosition.x -= cameraSpeed;
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
   {
     // Move left
-    cameraPosition.x -= cameraSpeed;
+    cameraPosition.y += cameraSpeed;
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
   {
     // Move right
-    cameraPosition.x += cameraSpeed;
+    cameraPosition.y -= cameraSpeed;
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
   {
     // Move up
-    cameraPosition.y -= cameraSpeed;
+    cameraPosition.z += cameraSpeed;
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
   {
     // Move down
-    cameraPosition.y += cameraSpeed;
+    cameraPosition.z -= cameraSpeed;
   }
 
   // Camera direction
@@ -301,25 +305,25 @@ void SingletonApp::processInput()
   if (glfwGetKey(this->window, GLFW_KEY_1) == GLFW_PRESS)
   {
     // Look forward
-    cameraDirection = glm::vec3(0, 0, -1);
+    cameraDirection = glm::vec3(1, 0, 0);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_2) == GLFW_PRESS)
   {
     // Look backward
-    cameraDirection = glm::vec3(0, 0, 1);
+    cameraDirection = glm::vec3(-1, 0, 0);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_3) == GLFW_PRESS)
   {
     // Look left
-    cameraDirection = glm::vec3(-1, 0, 0);
+    cameraDirection = glm::vec3(0, 1, 0);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_4) == GLFW_PRESS)
   {
     // Look right
-    cameraDirection = glm::vec3(1, 0, 0);
+    cameraDirection = glm::vec3(0, -1, 0);
   }
 }
 
@@ -340,7 +344,7 @@ void SingletonApp::execute()
     this->texture_conf.enable();
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-    glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniform1i(this->texture_conf.getUniformVarId("uTexture"), 0);
     glBindVertexArray(this->vao);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eab);
@@ -353,51 +357,60 @@ void SingletonApp::execute()
     glDrawArrays(GL_TRIANGLES, 6, 24);
     glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
     glDrawArrays(GL_TRIANGLES, 30, 6);
-    glActiveTexture(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     this->texture_conf.disable();
-    this->conf.enable();
     for (int i = -10; i <= 10; i = i + 10)
     {
       for (int j = 0; j <= 10; j = j + 10)
       {
+        this->texture_conf.enable();
+        glActiveTexture(GL_TEXTURE0);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));   // Rotate 90 degrees around Z axis
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f)); // Scale down by 20 times
         modelMatrix = model;
-        glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, -1.0f + j, 2.0f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));   // Rotate 90 degrees around Z axis
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f)); // Scale down by 20 times
         modelMatrix = model;
-        glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 0.0f + j, 4.0f));
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f)); // Scale down by 20 times
         modelMatrix = model;
-        glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(0);
+        this->texture_conf.disable();
       }
     }
-    modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-    glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-    glDrawArrays(GL_TRIANGLES, 36, 6);
-    this->conf.disable();
-    this->texture_conf.enable();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->texture);
-    glDrawArrays(GL_TRIANGLES, 42, 3);
-    glActiveTexture(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    this->texture_conf.disable();
-    this->conf.enable();
-    glDrawArrays(GL_TRIANGLE_FAN, 45, 59);
-    glBindVertexArray(0);
-    this->conf.disable();
+    for (int i = -10; i <= 10; i = i + 10)
+    {
+      for (int j = 0; j <= 3000; j = j + 1)
+      {
+        this->texture_conf.enable();
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(0.0f + i, -10.0f - j * 0.001, 1.0f));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f)); // Rotate 90 degrees around Z axis
+        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));                       // Scale down by 20 times
+        modelMatrix = model;
+        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glDrawArrays(GL_TRIANGLE_FAN, 36, 52);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glActiveTexture(0);
+        this->texture_conf.disable();
+      }
+    }
     this->processInput();
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -480,15 +493,16 @@ bool SingletonApp::prepareScene()
   }
   std::vector<Vertex> buffer;
   this->prepareCuboid(buffer);
-  this->prepareTriangles(buffer);
   this->prepareCircle(buffer);
   this->prepareVbo(buffer, this->vbo);
   this->prepareVao(this->vao);
-  this->prepareEab(this->eab);
+  // this->prepareEab(this->eab);
   this->prepareTexture(this->texture, "../resources/box.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_wall, "../resources/wall.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_floor, "../resources/floor.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_ceiling, "../resources/ceiling.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  this->prepareTexture(this->texture_obstacle_bottom, "../resources/obstacle_bottom.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  this->prepareTexture(this->texture_obstacle_up, "../resources/obstacle_up.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   return true;
 }
 

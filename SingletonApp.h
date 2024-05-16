@@ -23,6 +23,8 @@ private:
   GLuint texture_floor;
   GLuint texture_wall;
   GLuint texture_ceiling;
+  GLuint texture_obstacle_bottom;
+  GLuint texture_obstacle_up;
   float fieldOfView;
   glm::mat4 projectionMatrix;
   glm::mat4 viewMatrix;
