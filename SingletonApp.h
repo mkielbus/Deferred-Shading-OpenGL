@@ -32,7 +32,14 @@ private:
   glm::vec3 cameraPosition;
   glm::vec3 cameraDirection;
   glm::vec3 cameraUp;
+  float phi;
+  float theta;
   float cameraSpeed;
+  float mouse_sensitivity;
+  double last_x;
+  double last_y;
+  bool first_mouse_movement;
+  glm::vec3 right;
   void prepareCuboid(std::vector<Vertex> &buffer);
   void prepareTriangles(std::vector<Vertex> &buffer);
   void prepareCircle(std::vector<Vertex> &buffer);
@@ -41,6 +48,8 @@ private:
   void prepareEab(GLuint &eab);
   void processInput();
   void prepareTexture(GLuint &texture, std::string filepath, GLint paramWrapS, GLint paramWrapT, GLint paramMinFilter, GLuint paramMagFilter);
+  void processMouse(float xoffset, float yoffset);
+  void handleMouseMovement(GLFWwindow *window, double xpos, double ypos);
 
 public:
   SingletonApp(
@@ -48,6 +57,7 @@ public:
   SingletonApp &
   operator=(const SingletonApp &other_app) = delete;
   static SingletonApp &getInstance();
+  static void mouseCallback(GLFWwindow *window, double xpos, double ypos);
   bool prepareWindow();
   bool prepareScene();
   void execute();

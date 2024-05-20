@@ -51,7 +51,11 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
   cameraPosition = glm::vec3(-19, 0, 10);
   cameraDirection = glm::vec3(1, 0, 0);
   cameraUp = glm::vec3(0, 0, 1);
-  cameraSpeed = 0.05f;
+  cameraSpeed = 0.01f;
+  this->first_mouse_movement = true;
+  this->mouse_sensitivity = 0.2f;
+  this->phi = 0.0f;
+  this->theta = 90.0f;
 }
 
 SingletonApp &SingletonApp::getInstance()
@@ -268,36 +272,42 @@ void SingletonApp::processInput()
   {
     // Move forward
     cameraPosition.x += cameraSpeed;
+    cameraPosition.x = std::min(cameraPosition.x, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
   {
     // Move backward
     cameraPosition.x -= cameraSpeed;
+    cameraPosition.x = std::max(cameraPosition.x, -19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
   {
     // Move left
     cameraPosition.y += cameraSpeed;
+    cameraPosition.y = std::min(cameraPosition.y, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
   {
     // Move right
     cameraPosition.y -= cameraSpeed;
+    cameraPosition.y = std::max(cameraPosition.y, -19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
   {
     // Move up
     cameraPosition.z += cameraSpeed;
+    cameraPosition.z = std::min(cameraPosition.z, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
   {
     // Move down
     cameraPosition.z -= cameraSpeed;
+    cameraPosition.z = std::max(cameraPosition.z, 1.0f);
   }
 
   // Camera direction
@@ -330,6 +340,8 @@ void SingletonApp::processInput()
 void SingletonApp::execute()
 {
   glEnable(GL_DEPTH_TEST);
+  glfwSetWindowUserPointer(window, this);
+  glfwSetCursorPosCallback(window, SingletonApp::mouseCallback);
   while (!glfwWindowShouldClose(this->window))
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -504,6 +516,47 @@ bool SingletonApp::prepareScene()
   this->prepareTexture(this->texture_obstacle_bottom, "../resources/obstacle_bottom.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_obstacle_up, "../resources/obstacle_up.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   return true;
+}
+
+void SingletonApp::processMouse(float xoffset, float yoffset)
+{
+  xoffset *= this->mouse_sensitivity;
+  yoffset *= this->mouse_sensitivity;
+
+  this->phi += xoffset;
+  this->theta += yoffset;
+
+  glm::vec3 front;
+  front.x = sin(glm::radians(this->theta)) * cos(glm::radians(this->phi));
+  front.y = cos(glm::radians(this->theta));
+  front.z = sin(glm::radians(this->theta)) * sin(glm::radians(this->phi));
+  this->cameraDirection = glm::normalize(front);
+  // this->right = glm::normalize(glm::cross(this->cameraDirection, this->cameraUp));
+  // this->cameraUp = glm::normalize(glm::cross(this->right, this->cameraDirection));
+}
+
+void SingletonApp::handleMouseMovement(GLFWwindow *window, double xpos, double ypos)
+{
+  if (this->first_mouse_movement)
+  {
+    this->last_x = xpos;
+    this->last_y = ypos;
+    this->first_mouse_movement = false;
+  }
+
+  float xoffset = this->last_x - xpos;
+  float yoffset = ypos - this->last_y;
+  this->last_x = xpos;
+  this->last_y = ypos;
+
+  this->processMouse(xoffset, yoffset);
+}
+
+void SingletonApp::mouseCallback(GLFWwindow *window, double ypos, double xpos)
+{
+  SingletonApp *app = static_cast<SingletonApp *>(glfwGetWindowUserPointer(window));
+  if (app)
+    app->handleMouseMovement(window, xpos, ypos);
 }
 
 SingletonApp::~SingletonApp()
