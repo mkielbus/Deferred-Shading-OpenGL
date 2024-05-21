@@ -5,7 +5,30 @@
 #include <glm/gtc/type_ptr.hpp>
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
-#include "Data.hpp"
+
+std::string readShaderFile(std::string filePath)
+{
+  std::string content = "";
+  content.clear();
+
+  std::ifstream fileStream(filePath, std::ios::in);
+
+  if (!fileStream.is_open())
+  {
+    return "";
+  }
+
+  std::string line = "";
+  while (!fileStream.eof())
+  {
+    std::getline(fileStream, line);
+    content.append(line + "\n");
+  }
+
+  fileStream.close();
+
+  return content;
+}
 
 SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolution(glm::vec2(800, 600)), conf(std::string("#version 330 core\n") +
                                                                                                                  std::string("layout (location = 0) in vec3 attrPosition;\n") +
@@ -45,17 +68,21 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                                 std::string("void main() {\n") +
                                                 std::string("   vec4 texColor = texture(uTexture, texCoord);\n") +
                                                 std::string("   finalColor = vec4(texColor.xyz, 1.0);\n") +
-                                                std::string("}\n"))
+                                                std::string("}\n")),
+                               g_buffer_conf(readShaderFile("../resources/g_buffer_vertex_shader.vs"), readShaderFile("../resources/g_buffer_fragment_shader.fs")),
+                               quad_conf(readShaderFile("../resources/quad_vertex_shader.vs"), readShaderFile("../resources/quad_fragment_shader.fs"))
 {
   fieldOfView = 45;
-  cameraPosition = glm::vec3(-19, 0, 10);
-  cameraDirection = glm::vec3(1, 0, 0);
-  cameraUp = glm::vec3(0, 0, 1);
+  cameraPosition = glm::vec3(0, 0, 19);
+  cameraDirection = glm::vec3(0, 0, -1);
+  cameraUp = glm::vec3(0, 1, 0);
   cameraSpeed = 0.01f;
   this->first_mouse_movement = true;
   this->mouse_sensitivity = 0.2f;
-  this->phi = 0.0f;
-  this->theta = 90.0f;
+  this->phi = atan2(-1, 0);
+  this->theta = cos(0);
+  this->quad_vao = 0;
+  this->quad_vbo = 0;
 }
 
 SingletonApp &SingletonApp::getInstance()
@@ -184,6 +211,46 @@ void SingletonApp::prepareTriangles(std::vector<Vertex> &buffer)
   }
 }
 
+void SingletonApp::prepareQuad(std::vector<Vertex> &buffer)
+{
+  std::vector<glm::vec3> positions = {
+      glm::vec3(-1.0f, 1.0f, 0.0f),
+      glm::vec3(-1.0f, -1.0f, 0.0f),
+      glm::vec3(1.0f, -1.0f, 0.0f),
+      glm::vec3(-1.0f, 1.0f, 0.0f),
+      glm::vec3(1.0f, -1.0f, 0.0f),
+      glm::vec3(1.0f, 1.0f, 0.0f),
+  };
+  std::vector<glm::vec3> colors = {
+      glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(1.0f, 1.0f, 1.0f),
+      glm::vec3(1.0f, 1.0f, 1.0f),
+  };
+  std::vector<glm::vec3> normals = {
+      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+      glm::vec3(0.0f, 0.0f, 1.0f),
+  };
+  std::vector<glm::vec2> tex2d_coords = {
+      glm::vec2(0.0f, 1.0f),
+      glm::vec2(0.0f, 0.0f),
+      glm::vec2(1.0f, 0.0f),
+      glm::vec2(0.0f, 1.0f),
+      glm::vec2(1.0f, 0.0f),
+      glm::vec2(1.0f, 1.0f),
+  };
+  for (size_t i = 0; i < 6; i++)
+  {
+    buffer.push_back(Vertex(positions[i], colors[i], normals[i], tex2d_coords[i]));
+  }
+}
+
 void SingletonApp::prepareCircle(std::vector<Vertex> &buffer)
 {
   glm::vec3 circleMiddle = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -271,43 +338,43 @@ void SingletonApp::processInput()
   if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
   {
     // Move forward
-    cameraPosition.x += cameraSpeed;
-    cameraPosition.x = std::min(cameraPosition.x, 19.0f);
+    cameraPosition.z -= cameraSpeed;
+    cameraPosition.z = std::max(cameraPosition.z, 1.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
   {
     // Move backward
-    cameraPosition.x -= cameraSpeed;
-    cameraPosition.x = std::max(cameraPosition.x, -19.0f);
+    cameraPosition.z += cameraSpeed;
+    cameraPosition.z = std::min(cameraPosition.z, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
   {
     // Move left
-    cameraPosition.y += cameraSpeed;
-    cameraPosition.y = std::min(cameraPosition.y, 19.0f);
+    cameraPosition.x -= cameraSpeed;
+    cameraPosition.x = std::max(cameraPosition.x, -19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
   {
     // Move right
-    cameraPosition.y -= cameraSpeed;
-    cameraPosition.y = std::max(cameraPosition.y, -19.0f);
+    cameraPosition.x += cameraSpeed;
+    cameraPosition.x = std::min(cameraPosition.x, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
   {
     // Move up
-    cameraPosition.z += cameraSpeed;
-    cameraPosition.z = std::min(cameraPosition.z, 19.0f);
+    cameraPosition.y += cameraSpeed;
+    cameraPosition.y = std::min(cameraPosition.y, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
   {
     // Move down
-    cameraPosition.z -= cameraSpeed;
-    cameraPosition.z = std::max(cameraPosition.z, 1.0f);
+    cameraPosition.y -= cameraSpeed;
+    cameraPosition.y = std::max(cameraPosition.y, -19.0f);
   }
 
   // Camera direction
@@ -503,6 +570,16 @@ bool SingletonApp::prepareScene()
   {
     return false;
   }
+  status = this->g_buffer_conf.init();
+  if (!status)
+  {
+    return false;
+  }
+  status = this->quad_conf.init();
+  if (!status)
+  {
+    return false;
+  }
   std::vector<Vertex> buffer;
   this->prepareCuboid(buffer);
   this->prepareCircle(buffer);
@@ -515,6 +592,18 @@ bool SingletonApp::prepareScene()
   this->prepareTexture(this->texture_ceiling, "../resources/ceiling.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_obstacle_bottom, "../resources/obstacle_bottom.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_obstacle_up, "../resources/obstacle_up.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
+  std::vector<Vertex> bufferQuad;
+  this->prepareQuad(bufferQuad);
+  this->prepareVbo(buffer, this->quad_vao);
+  this->prepareVao(this->quad_vao);
+  g_buffer.Init(glm::vec2(300, 300));
+  g_buffer.AddDepthBuffer();
+  g_buffer.SetAttachmentTexture(0, GL_RGB, GL_FLOAT);
+  g_buffer.SetAttachmentTexture(1, GL_RGB, GL_FLOAT);
+  g_buffer.SetAttachmentTexture(2, GL_RGBA, GL_UNSIGNED_BYTE);
+  // framebuffer.SetAttachmentDepth(GL_DEPTH_COMPONENT24);
+  g_buffer.SetDrawBuffers({0, 1, 2});
+  g_buffer.Deactivate();
   return true;
 }
 
@@ -526,6 +615,10 @@ void SingletonApp::processMouse(float xoffset, float yoffset)
   this->phi += xoffset;
   this->theta += yoffset;
 
+  if (this->theta > -1.0f)
+    this->theta = -1.0f;
+  if (this->theta < -179.0f)
+    this->theta = -179.0f;
   glm::vec3 front;
   front.x = sin(glm::radians(this->theta)) * cos(glm::radians(this->phi));
   front.y = cos(glm::radians(this->theta));
@@ -544,15 +637,15 @@ void SingletonApp::handleMouseMovement(GLFWwindow *window, double xpos, double y
     this->first_mouse_movement = false;
   }
 
-  float xoffset = this->last_x - xpos;
-  float yoffset = ypos - this->last_y;
+  float xoffset = xpos - this->last_x;
+  float yoffset = this->last_y - ypos;
   this->last_x = xpos;
   this->last_y = ypos;
 
   this->processMouse(xoffset, yoffset);
 }
 
-void SingletonApp::mouseCallback(GLFWwindow *window, double ypos, double xpos)
+void SingletonApp::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 {
   SingletonApp *app = static_cast<SingletonApp *>(glfwGetWindowUserPointer(window));
   if (app)

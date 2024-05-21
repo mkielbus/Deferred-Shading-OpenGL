@@ -23,7 +23,7 @@ public:
     ShadersConf();
     ShadersConf(std::string vertex_shader_template, std::string fragment_shader_template);
     ~ShadersConf() = default;
-    ShadersConf(const ShadersConf &) = delete;
+    ShadersConf(const ShadersConf &);
     ShadersConf &operator=(const ShadersConf &) = delete;
     void enable() const;
     void disable() const;

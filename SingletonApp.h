@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 #include "ShadersConf.h"
 #include "Data.hpp"
+#include "Framebuffer.h"
 
 class SingletonApp
 {
@@ -40,9 +41,15 @@ private:
   double last_y;
   bool first_mouse_movement;
   glm::vec3 right;
+  GLuint quad_vao;
+  GLuint quad_vbo;
+  Framebuffer g_buffer;
+  ShadersConf g_buffer_conf;
+  ShadersConf quad_conf;
   void prepareCuboid(std::vector<Vertex> &buffer);
   void prepareTriangles(std::vector<Vertex> &buffer);
   void prepareCircle(std::vector<Vertex> &buffer);
+  void prepareQuad(std::vector<Vertex> &buffer);
   void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
   void prepareVao(GLuint &vao);
   void prepareEab(GLuint &eab);
