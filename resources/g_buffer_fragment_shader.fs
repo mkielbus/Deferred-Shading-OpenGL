@@ -8,7 +8,7 @@ in vec3 FragPos;
 in vec3 Normal;
 
 uniform sampler2D texture_diffuse1;
-// uniform sampler2D texture_specular1;
+uniform sampler2D texture_specular1;
 
 void main()
 {    
@@ -17,6 +17,6 @@ void main()
     gNormal = normalize(Normal);
     gAlbedoSpec.rgb = texture(texture_diffuse1, TexCoords).rgb;
     // Specular intensity is stored in gAlbedoSpec's alpha component
-    // gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;
-    gAlbedoSpec.a = 1.0;
+    gAlbedoSpec.a = texture(texture_specular1, TexCoords).r;
+    // gAlbedoSpec.a = 1.0;
 }

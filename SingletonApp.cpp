@@ -454,6 +454,7 @@ void SingletonApp::execute()
     glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniform1i(this->g_buffer_conf.getUniformVarId("texture_diffuse1"), 0);
+    glUniform1i(this->g_buffer_conf.getUniformVarId("texture_specular1"), 1);
     this->g_buffer_conf.disable();
     this->quad_conf.enable();
     glUniform1i(this->quad_conf.getUniformVarId("gPosition"), 0);
@@ -467,9 +468,17 @@ void SingletonApp::execute()
     glBindVertexArray(this->vao);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, this->texture_floor);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, this->texture_floor);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, this->texture_wall);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, this->texture_wall);
     glDrawArrays(GL_TRIANGLES, 6, 24);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
     glDrawArrays(GL_TRIANGLES, 30, 6);
     // this->texture_conf.disable();
@@ -480,13 +489,15 @@ void SingletonApp::execute()
       {
         // this->texture_conf.enable();
         this->g_buffer_conf.enable();
-        glActiveTexture(GL_TEXTURE0);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
@@ -495,6 +506,9 @@ void SingletonApp::execute()
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
@@ -502,6 +516,9 @@ void SingletonApp::execute()
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -517,6 +534,8 @@ void SingletonApp::execute()
         // this->texture_conf.enable();
         this->g_buffer_conf.enable();
         glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+        glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, -10.0f - j * 0.001, 1.0f));
@@ -543,12 +562,12 @@ void SingletonApp::execute()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
     glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 light_pos = glm::vec3(5.0f, 5.0f, 15.0f);
     glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
     glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
-    glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.5f);
-    glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.2f);
+    glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.0001f);
+    glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.0001f);
     glBindVertexArray(this->quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
