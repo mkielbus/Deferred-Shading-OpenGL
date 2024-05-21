@@ -76,7 +76,7 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
   cameraPosition = glm::vec3(0, 0, 19);
   cameraDirection = glm::vec3(0, 0, -1);
   cameraUp = glm::vec3(0, 1, 0);
-  cameraSpeed = 0.01f;
+  cameraSpeed = 0.05f;
   this->first_mouse_movement = true;
   this->mouse_sensitivity = 0.2f;
   this->phi = atan2(-1, 0);
@@ -425,7 +425,23 @@ void SingletonApp::execute()
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
     glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
     glUniform1i(this->texture_conf.getUniformVarId("uTexture"), 0);
+    this->texture_conf.disable();
+    this->g_buffer_conf.enable();
+    glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+    glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+    glUniform1i(this->g_buffer_conf.getUniformVarId("texture_diffuse1"), 0);
+    this->g_buffer_conf.disable();
+    this->quad_conf.enable();
+    glUniform1i(this->quad_conf.getUniformVarId("gPosition"), 0);
+    glUniform1i(this->quad_conf.getUniformVarId("gNormal"), 1);
+    glUniform1i(this->quad_conf.getUniformVarId("gAlbedoSpec"), 2);
+    this->quad_conf.disable();
+    this->texture_conf.enable();
+    // this->g_buffer_conf.enable();
     glBindVertexArray(this->vao);
+    // this->g_buffer.Clear();
+    // this->g_buffer.Activate();
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eab);
     // glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
     // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -437,11 +453,13 @@ void SingletonApp::execute()
     glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
     glDrawArrays(GL_TRIANGLES, 30, 6);
     this->texture_conf.disable();
+    // this->g_buffer_conf.disable();
     for (int i = -10; i <= 10; i = i + 10)
     {
       for (int j = 0; j <= 10; j = j + 10)
       {
         this->texture_conf.enable();
+        // this->g_buffer_conf.enable();
         glActiveTexture(GL_TEXTURE0);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
@@ -469,6 +487,7 @@ void SingletonApp::execute()
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(0);
         this->texture_conf.disable();
+        // this->g_buffer_conf.disable();
       }
     }
     for (int i = -10; i <= 10; i = i + 10)
@@ -476,6 +495,7 @@ void SingletonApp::execute()
       for (int j = 0; j <= 3000; j = j + 1)
       {
         this->texture_conf.enable();
+        // this->g_buffer_conf.enable();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glm::mat4 model = glm::mat4(1.0f);
@@ -488,8 +508,31 @@ void SingletonApp::execute()
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(0);
         this->texture_conf.disable();
+        // this->g_buffer_conf.disable();
       }
     }
+    // this->g_buffer.Deactivate();
+    // glBindVertexArray(0);
+    // this->quad_conf.enable();
+    // glBindVertexArray(this->quad_vao);
+    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    // glViewport(0, 0, (GLsizei)this->window_resolution.x, (GLsizei)this->window_resolution.y);
+    // glActiveTexture(GL_TEXTURE0);
+    // glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(0));
+    // glActiveTexture(GL_TEXTURE1);
+    // glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(1));
+    // glActiveTexture(GL_TEXTURE2);
+    // glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
+    // glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
+    // glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 0.0f);
+    // glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+    // glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
+    // glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
+    // glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.5f);
+    // glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.2f);
+    // glDrawArrays(GL_TRIANGLES, 0, 6);
+    // glBindVertexArray(0);
+    // this->quad_conf.disable();
     this->processInput();
     glfwSwapBuffers(this->window);
     glfwPollEvents();
