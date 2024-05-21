@@ -110,8 +110,31 @@ bool SingletonApp::prepareWindow()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
+  // Get the primary monitor
+  GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
+  if (!primaryMonitor)
+  {
+    std::cerr << "Failed to get the primary monitor" << std::endl;
+    glfwTerminate();
+    return -1;
+  }
+
+  // Get video mode of the primary monitor
+  const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
+  if (!mode)
+  {
+    std::cerr << "Failed to get the video mode of the primary monitor" << std::endl;
+    glfwTerminate();
+    return -1;
+  }
+
+  int screenWidth = mode->width;
+  this->window_resolution.x = screenWidth;
+  int screenHeight = mode->height;
+  this->window_resolution.y = screenHeight;
+
   // Utwórz okno
-  this->window = glfwCreateWindow((int)this->window_resolution.x, (int)this->window_resolution.y, "Scena 3D", nullptr, nullptr);
+  this->window = glfwCreateWindow(screenWidth, screenHeight, "Scena 3D", nullptr, nullptr);
   if (!window)
   {
     std::cerr << "Błąd tworzenia okna GLFW" << std::endl;
@@ -382,25 +405,25 @@ void SingletonApp::processInput()
   if (glfwGetKey(this->window, GLFW_KEY_1) == GLFW_PRESS)
   {
     // Look forward
-    cameraDirection = glm::vec3(1, 0, 0);
+    cameraDirection = glm::vec3(0, 0, -1);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_2) == GLFW_PRESS)
   {
     // Look backward
-    cameraDirection = glm::vec3(-1, 0, 0);
+    cameraDirection = glm::vec3(0, 0, 1);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_3) == GLFW_PRESS)
   {
     // Look left
-    cameraDirection = glm::vec3(0, 1, 0);
+    cameraDirection = glm::vec3(-1, 0, 0);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_4) == GLFW_PRESS)
   {
     // Look right
-    cameraDirection = glm::vec3(0, -1, 0);
+    cameraDirection = glm::vec3(1, 0, 0);
   }
 }
 
@@ -437,14 +460,11 @@ void SingletonApp::execute()
     glUniform1i(this->quad_conf.getUniformVarId("gNormal"), 1);
     glUniform1i(this->quad_conf.getUniformVarId("gAlbedoSpec"), 2);
     this->quad_conf.disable();
-    this->texture_conf.enable();
-    // this->g_buffer_conf.enable();
+    // this->texture_conf.enable();
+    this->g_buffer.Clear();
+    this->g_buffer.Activate();
+    this->g_buffer_conf.enable();
     glBindVertexArray(this->vao);
-    // this->g_buffer.Clear();
-    // this->g_buffer.Activate();
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->eab);
-    // glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
-    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, this->texture_floor);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -452,21 +472,21 @@ void SingletonApp::execute()
     glDrawArrays(GL_TRIANGLES, 6, 24);
     glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
     glDrawArrays(GL_TRIANGLES, 30, 6);
-    this->texture_conf.disable();
-    // this->g_buffer_conf.disable();
+    // this->texture_conf.disable();
+    this->g_buffer_conf.disable();
     for (int i = -10; i <= 10; i = i + 10)
     {
       for (int j = 0; j <= 10; j = j + 10)
       {
-        this->texture_conf.enable();
-        // this->g_buffer_conf.enable();
+        // this->texture_conf.enable();
+        this->g_buffer_conf.enable();
         glActiveTexture(GL_TEXTURE0);
         glm::mat4 model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
         modelMatrix = model;
-        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
@@ -474,28 +494,28 @@ void SingletonApp::execute()
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
         modelMatrix = model;
-        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.0f + i, 0.0f + j, 4.0f));
         model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f));
         modelMatrix = model;
-        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
         glDrawArrays(GL_TRIANGLES, 0, 36);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(0);
-        this->texture_conf.disable();
-        // this->g_buffer_conf.disable();
+        // this->texture_conf.disable();
+        this->g_buffer_conf.disable();
       }
     }
     for (int i = -10; i <= 10; i = i + 10)
     {
       for (int j = 0; j <= 3000; j = j + 1)
       {
-        this->texture_conf.enable();
-        // this->g_buffer_conf.enable();
+        // this->texture_conf.enable();
+        this->g_buffer_conf.enable();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glm::mat4 model = glm::mat4(1.0f);
@@ -503,36 +523,36 @@ void SingletonApp::execute()
         model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
         model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
         modelMatrix = model;
-        glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glDrawArrays(GL_TRIANGLE_FAN, 36, 52);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(0);
-        this->texture_conf.disable();
-        // this->g_buffer_conf.disable();
+        // this->texture_conf.disable();
+        this->g_buffer_conf.disable();
       }
     }
-    // this->g_buffer.Deactivate();
-    // glBindVertexArray(0);
-    // this->quad_conf.enable();
-    // glBindVertexArray(this->quad_vao);
-    // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // glViewport(0, 0, (GLsizei)this->window_resolution.x, (GLsizei)this->window_resolution.y);
-    // glActiveTexture(GL_TEXTURE0);
-    // glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(0));
-    // glActiveTexture(GL_TEXTURE1);
-    // glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(1));
-    // glActiveTexture(GL_TEXTURE2);
-    // glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
-    // glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    // glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
-    // glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
-    // glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
-    // glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.5f);
-    // glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.2f);
-    // glDrawArrays(GL_TRIANGLES, 0, 6);
-    // glBindVertexArray(0);
-    // this->quad_conf.disable();
+    this->g_buffer.Deactivate();
+    glBindVertexArray(0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glViewport(0, 0, (GLsizei)this->window_resolution.x, (GLsizei)this->window_resolution.y);
+    this->quad_conf.enable();
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(0));
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(1));
+    glActiveTexture(GL_TEXTURE2);
+    glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
+    glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
+    glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 3.0f);
+    glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+    glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
+    glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
+    glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.5f);
+    glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.2f);
+    glBindVertexArray(this->quad_vao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
+    glBindVertexArray(0);
+    this->quad_conf.disable();
     this->processInput();
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -637,9 +657,9 @@ bool SingletonApp::prepareScene()
   this->prepareTexture(this->texture_obstacle_up, "../resources/obstacle_up.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   std::vector<Vertex> bufferQuad;
   this->prepareQuad(bufferQuad);
-  this->prepareVbo(buffer, this->quad_vao);
+  this->prepareVbo(bufferQuad, this->quad_vbo);
   this->prepareVao(this->quad_vao);
-  g_buffer.Init(glm::vec2(300, 300));
+  g_buffer.Init(glm::vec2(this->window_resolution.x, this->window_resolution.y));
   g_buffer.AddDepthBuffer();
   g_buffer.SetAttachmentTexture(0, GL_RGB, GL_FLOAT);
   g_buffer.SetAttachmentTexture(1, GL_RGB, GL_FLOAT);
