@@ -14,9 +14,10 @@ struct Light {
 
     float Linear;
     float Quadratic;
+    float SpecExp;
 };
 
-uniform Light light;
+uniform Light lights[3];
 uniform vec3 viewPos;
 
 void main()
@@ -29,26 +30,33 @@ void main()
     
     // Ambient
     vec3 ambient = 0.1 * Albedo;
-    
+
+    for(int iter = 0; iter < 3; iter++)
+    {
     // Diffuse
-    vec3 lightDir = normalize(light.Position - FragPos);
+    vec3 lightDir = normalize(lights[iter].Position - FragPos);
     float diff = max(dot(Normal, lightDir), 0.0);
-    vec3 diffuse = diff * light.Color * Albedo;
+    vec3 diffuse = diff * lights[iter].Color * Albedo;
     
     // Specular
     vec3 viewDir = normalize(viewPos - FragPos);
     //vec3 reflectDir = reflect(-lightDir, Normal);
     vec3 tmpDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(Normal, tmpDir), 0.0), 16.0);
-    vec3 specular = light.Color * spec * Specular;
+    float spec = pow(max(dot(Normal, tmpDir), 0.0), lights[iter].SpecExp);
+    vec3 specular = lights[iter].Color * spec * Specular;
     
     // Attenuation
-    float distance = length(light.Position - FragPos);
-    float attenuation = 1.0 / (1.0 + light.Linear * distance + light.Quadratic * (distance * distance));
+    float distance = length(lights[iter].Position - FragPos);
+    float attenuation = 1.0 / (1.0 + lights[iter].Linear * distance + lights[iter].Quadratic * (distance * distance));
     
     diffuse *= attenuation;
     specular *= attenuation;
 
-    vec3 result = ambient + diffuse + specular;
+    ambient += diffuse + specular;
+
+    }
+
+    //vec3 result = ambient + diffuse + specular;
+    vec3 result = ambient;
     FragColor = vec4(result, 1.0);
 }
