@@ -38,7 +38,7 @@ void main()
     // Specular
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, Normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 64.0);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
     vec3 specular = light.Color * spec * Specular;
     
     // Attenuation

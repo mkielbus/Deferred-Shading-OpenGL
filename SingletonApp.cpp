@@ -73,7 +73,7 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                quad_conf(readShaderFile("../resources/quad_vertex_shader.vs"), readShaderFile("../resources/quad_fragment_shader.fs"))
 {
   fieldOfView = 45;
-  cameraPosition = glm::vec3(0, 0, 19);
+  cameraPosition = glm::vec3(0, 10, 19);
   cameraDirection = glm::vec3(0, 0, -1);
   cameraUp = glm::vec3(0, 1, 0);
   cameraSpeed = 0.05f;
@@ -160,18 +160,18 @@ bool SingletonApp::prepareWindow()
 
 void SingletonApp::prepareCuboid(std::vector<Vertex> &buffer)
 {
-  std::vector<glm::vec3> positions = {glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f),
-                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f),
-                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 20.0f),
-                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(20.0f, -20.0f, 20.0f),
-                                      glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 20.0f),
-                                      glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
-                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 0.0f), glm::vec3(-20.0f, 20.0f, 20.0f),
-                                      glm::vec3(-20.0f, -20.0f, 0.0f), glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(-20.0f, 20.0f, 20.0f),
-                                      glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 0.0f), glm::vec3(20.0f, 20.0f, 20.0f),
-                                      glm::vec3(20.0f, -20.0f, 0.0f), glm::vec3(20.0f, -20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
-                                      glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
-                                      glm::vec3(-20.0f, -20.0f, 20.0f), glm::vec3(20.0f, -20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f)};
+  std::vector<glm::vec3> positions = {glm::vec3(-20.0f, 0.0f, 20.0f), glm::vec3(-20.0f, 0.0f, -20.0f), glm::vec3(20.0f, 0.0f, -20.0f),
+                                      glm::vec3(-20.0f, 0.0f, 20.0f), glm::vec3(20.0f, 0.0, 20.0f), glm::vec3(20.0f, 0.0f, -20.0f),
+                                      glm::vec3(-20.0f, 0.0f, 20.0f), glm::vec3(20.0f, 0.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, 0.0f, 20.0f), glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f),
+                                      glm::vec3(-20.0f, 0.0f, -20.0f), glm::vec3(20.0f, 0.0f, -20.0f), glm::vec3(20.0f, 20.0f, -20.0f),
+                                      glm::vec3(-20.0f, 0.0f, -20.0f), glm::vec3(-20.0f, 20.0f, -20.0f), glm::vec3(20.0f, 20.0f, -20.0f),
+                                      glm::vec3(-20.0f, 0.0f, 20.0f), glm::vec3(-20.0f, 0.0f, -20.0f), glm::vec3(-20.0f, 20.0f, -20.0f),
+                                      glm::vec3(-20.0f, 0.0f, 20.0f), glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(-20.0f, 20.0f, -20.0f),
+                                      glm::vec3(20.0f, 0.0f, 20.0f), glm::vec3(20.0f, 0.0f, -20.0f), glm::vec3(20.0f, 20.0f, -20.0f),
+                                      glm::vec3(20.0f, 0.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, -20.0f),
+                                      glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(-20.0f, 20.0f, -20.0f), glm::vec3(20.0f, 20.0f, -20.0f),
+                                      glm::vec3(-20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, 20.0f), glm::vec3(20.0f, 20.0f, -20.0f)};
   std::vector<glm::vec3> colors = {glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
                                    glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
                                    glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
@@ -184,18 +184,31 @@ void SingletonApp::prepareCuboid(std::vector<Vertex> &buffer)
                                    glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
                                    glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f),
                                    glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 1.0f, 1.0f)};
-  std::vector<glm::vec3> normals = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+  std::vector<glm::vec3> normals = {glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
                                     glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
-                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
-                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-                                    glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
-                                    glm::vec3(-1.0f, 1.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
                                     glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
-                                    glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f)};
+                                    glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                                    glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+
+                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                                    glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f), glm::vec3(0.0f, -1.0f, 0.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
+                                    glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                                    glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f), glm::vec3(0.0f, 0.0f, -1.0f),
+                                    glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                                    glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f), glm::vec3(-1.0f, 0.0f, 0.0f),
+                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f),
+                                    glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
   std::vector<glm::vec2> tex2d_coords = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
                                          glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
                                          glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f),
@@ -208,29 +221,9 @@ void SingletonApp::prepareCuboid(std::vector<Vertex> &buffer)
                                          glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
                                          glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f),
                                          glm::vec2(0.0f, 0.0f), glm::vec2(1.0f, 0.0f), glm::vec2(1.0f, 1.0f)};
-  for (size_t i = 0; i < 36; i++)
+  for (size_t i = 0; i < 72; i++)
   {
-    buffer.push_back(Vertex(positions[i], colors[i], normals[i], tex2d_coords[i]));
-  }
-}
-
-void SingletonApp::prepareTriangles(std::vector<Vertex> &buffer)
-{
-  std::vector<glm::vec3> positions = {glm::vec3(-0.99f, 0.0f, 0.01f), glm::vec3(-0.7f, -0.5f, 0.01f), glm::vec3(-0.7f, 0.5f, 0.01f),
-                                      glm::vec3(0.99f, 0.0f, 0.01f), glm::vec3(0.7f, -0.5f, 0.01f), glm::vec3(0.7f, 0.5f, 0.01f),
-                                      glm::vec3(-0.7f, 0.5f, 0.01f), glm::vec3(0.7f, 0.5f, 0.01f), glm::vec3(0.0f, 0.8f, 0.01f)};
-  std::vector<glm::vec3> colors = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                                   glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f),
-                                   glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f)};
-  std::vector<glm::vec3> normals = {glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f),
-                                    glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f)};
-  std::vector<glm::vec2> tex2d_coords = {glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f),
-                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 0.0f),
-                                         glm::vec2(0.0f, 0.0f), glm::vec2(0.0f, 1.0f), glm::vec2(1.0f, 1.0f)};
-  for (size_t i = 0; i < 9; i++)
-  {
-    buffer.push_back(Vertex(positions[i], colors[i], normals[i], tex2d_coords[i]));
+    buffer.push_back(Vertex(positions[i % 36], colors[i % 36], normals[i], tex2d_coords[i % 36]));
   }
 }
 
@@ -362,7 +355,7 @@ void SingletonApp::processInput()
   {
     // Move forward
     cameraPosition.z -= cameraSpeed;
-    cameraPosition.z = std::max(cameraPosition.z, 1.0f);
+    cameraPosition.z = std::max(cameraPosition.z, -19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
@@ -397,7 +390,7 @@ void SingletonApp::processInput()
   {
     // Move down
     cameraPosition.y -= cameraSpeed;
-    cameraPosition.y = std::max(cameraPosition.y, -19.0f);
+    cameraPosition.y = std::max(cameraPosition.y, 1.0f);
   }
 
   // Camera direction
@@ -485,65 +478,43 @@ void SingletonApp::execute()
     this->g_buffer_conf.disable();
     for (int i = -10; i <= 10; i = i + 10)
     {
-      for (int j = 0; j <= 10; j = j + 10)
+      for (int j = -10; j <= 10; j = j + 10)
       {
         // this->texture_conf.enable();
         this->g_buffer_conf.enable();
         glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f + i, 2.0f + j, 2.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
+        model = glm::translate(model, glm::vec3(2.0f + j, 0.01f, 0.0f + i));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 36, 36);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f + i, -1.0f + j, 2.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 10.0f, 1.0f / 20.0f));
+        model = glm::translate(model, glm::vec3(-1.0f + j, 0.01f, 0.0f + i));
+        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_TRIANGLES, 36, 36);
         model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f + i, 0.0f + j, 4.0f));
-        model = glm::scale(model, glm::vec3(1.0f / 25.0f, 1.0f / 6.0f, 1.0f / 20.0f));
+        model = glm::translate(model, glm::vec3(0.5f + j, 4.0f, 0.0f + i));
+        // model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        model = glm::scale(model, glm::vec3(1.0f / 5.0f, 1.0f / 15.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glActiveTexture(0);
-        // this->texture_conf.disable();
-        this->g_buffer_conf.disable();
-      }
-    }
-    for (int i = -10; i <= 10; i = i + 10)
-    {
-      for (int j = 0; j <= 3000; j = j + 1)
-      {
-        // this->texture_conf.enable();
-        this->g_buffer_conf.enable();
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.0f + i, -10.0f - j * 0.001, 1.0f));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
-        modelMatrix = model;
-        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        glDrawArrays(GL_TRIANGLE_FAN, 36, 52);
+        glDrawArrays(GL_TRIANGLES, 36, 36);
         glBindTexture(GL_TEXTURE_2D, 0);
         glActiveTexture(0);
         // this->texture_conf.disable();
@@ -562,12 +533,12 @@ void SingletonApp::execute()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
     glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    glm::vec3 light_pos = glm::vec3(5.0f, 5.0f, 15.0f);
+    glm::vec3 light_pos = glm::vec3(10.0f, 1.0f, -2.0f);
     glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
     glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
-    glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.0001f);
-    glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.0001f);
+    glUniform1f(this->quad_conf.getUniformVarId("light.Linear"), 0.00001f);
+    glUniform1f(this->quad_conf.getUniformVarId("light.Quadratic"), 0.00001f);
     glBindVertexArray(this->quad_vao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
