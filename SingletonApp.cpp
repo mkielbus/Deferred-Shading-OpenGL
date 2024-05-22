@@ -710,8 +710,8 @@ void SingletonApp::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
 SingletonApp::~SingletonApp()
 {
-  glDeleteVertexArrays(1, &this->vao);
-  glDeleteBuffers(1, &this->vbo);
-  glDeleteBuffers(1, &this->eab);
+  // glDeleteVertexArrays(1, &this->vao);
+  // glDeleteBuffers(1, &this->vbo);
+  // glDeleteBuffers(1, &this->eab);
   glfwTerminate();
 }
