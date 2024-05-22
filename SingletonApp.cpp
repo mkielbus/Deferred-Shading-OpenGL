@@ -506,7 +506,6 @@ void SingletonApp::execute()
         glDrawArrays(GL_TRIANGLES, 36, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(0.5f + j, 4.0f, 0.0f + i));
-        // model = glm::rotate(model, glm::radians(-90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
         model = glm::scale(model, glm::vec3(1.0f / 5.0f, 1.0f / 15.0f, 1.0f / 20.0f));
         modelMatrix = model;
         glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
@@ -533,7 +532,7 @@ void SingletonApp::execute()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
     glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    glm::vec3 light_pos = glm::vec3(10.0f, 1.0f, -2.0f);
+    glm::vec3 light_pos = glm::vec3(0.0f, 5.0f, 19.5f);
     glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
     glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
