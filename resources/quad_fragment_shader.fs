@@ -23,7 +23,7 @@ void main()
 {
     // Pozyskanie danych z G-Buffer
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
-    vec3 Normal = normalize(texture(gNormal, TexCoords).rgb);
+    vec3 Normal = texture(gNormal, TexCoords).rgb;
     vec3 Albedo = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
     
@@ -37,8 +37,9 @@ void main()
     
     // Specular
     vec3 viewDir = normalize(viewPos - FragPos);
-    vec3 reflectDir = reflect(-lightDir, Normal);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 16.0);
+    //vec3 reflectDir = reflect(-lightDir, Normal);
+    vec3 tmpDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(Normal, tmpDir), 0.0), 16.0);
     vec3 specular = light.Color * spec * Specular;
     
     // Attenuation

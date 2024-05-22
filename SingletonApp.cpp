@@ -532,7 +532,7 @@ void SingletonApp::execute()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
     glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    glm::vec3 light_pos = glm::vec3(0.0f, 5.0f, 19.5f);
+    glm::vec3 light_pos = glm::vec3(0.0f, 10.0f, 19.5f);
     glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3fv(this->quad_conf.getUniformVarId("light.Position"), 1, glm::value_ptr(light_pos));
     glUniform3fv(this->quad_conf.getUniformVarId("light.Color"), 1, glm::value_ptr(light_color));
