@@ -47,7 +47,6 @@ private:
   ShadersConf g_buffer_conf;
   ShadersConf quad_conf;
   void prepareCuboid(std::vector<Vertex> &buffer);
-  void prepareTriangles(std::vector<Vertex> &buffer);
   void prepareCircle(std::vector<Vertex> &buffer);
   void prepareQuad(std::vector<Vertex> &buffer);
   void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
