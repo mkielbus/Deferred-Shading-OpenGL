@@ -533,7 +533,8 @@ void SingletonApp::execute()
     glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
     glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
     glm::vec3 light_pos[3] = {glm::vec3(0.0f, 10.0f, 19.5f), glm::vec3(19.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, -19.0f)};
-    for (unsigned int iter = 0; iter < 3; iter++)
+    // glm::vec3 light_pos[1] = {glm::vec3(-19.0f, 10.0f, -19.0f)};
+    for (unsigned int iter = 0; iter < light_pos->length(); iter++)
     {
       glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
       glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Position"), 1, glm::value_ptr(light_pos[iter]));
