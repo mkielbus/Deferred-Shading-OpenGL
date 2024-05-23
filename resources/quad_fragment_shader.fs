@@ -24,7 +24,7 @@ void main()
 {
     // Pozyskanie danych z G-Buffer
     vec3 FragPos = texture(gPosition, TexCoords).rgb;
-    vec3 Normal = normalize(texture(gNormal, TexCoords).rgb);
+    vec3 Normal = normalize(texture(gNormal, TexCoords)).rgb;
     vec3 Albedo = texture(gAlbedoSpec, TexCoords).rgb;
     float Specular = texture(gAlbedoSpec, TexCoords).a;
     
