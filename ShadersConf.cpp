@@ -22,6 +22,10 @@ ShadersConf::ShadersConf(std::string vertex_shader_template, std::string fragmen
 {
 }
 
+ShadersConf::ShadersConf(const ShadersConf &other_shader) : vertex_shader_template(other_shader.vertex_shader_template), fragment_shader_template(other_shader.fragment_shader_template), conf_id(0)
+{
+}
+
 GLuint ShadersConf::getConfId() const
 {
     return this->conf_id;
