@@ -428,7 +428,7 @@ void SingletonApp::execute()
   while (!glfwWindowShouldClose(this->window))
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    projectionMatrix = glm::perspective(glm::radians(fieldOfView), this->window_resolution.x / this->window_resolution.y, 0.1f, 100.0f);
+    projectionMatrix = glm::perspective(glm::radians(fieldOfView), this->window_resolution.x / this->window_resolution.y, 0.5f, 60.0f);
     viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
     modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     this->conf.enable();
