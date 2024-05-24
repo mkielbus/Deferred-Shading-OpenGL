@@ -532,15 +532,17 @@ void SingletonApp::execute()
     glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
     glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    glm::vec3 light_pos[5] = {glm::vec3(0.0f, 10.0f, 19.5f), glm::vec3(-19.0f, 10.0f, 0.0f), glm::vec3(19.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, -19.0f), glm::vec3(0.0f, 19.0f, 0.0f)};
-    // glm::vec3 light_pos[1] = {glm::vec3(0.0f, 19.0f, 0.0f)};
+    glm::vec3 light_pos[5] = {glm::vec3(0.0f, 10.0f, 19.0f), glm::vec3(-19.0f, 10.0f, 0.0f), glm::vec3(19.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, -19.0f), glm::vec3(0.0f, 19.0f, 0.0f)};
+    // glm::vec3 light_pos[1] = {glm::vec3(0.0f, 19.5f, 0.0f)};
     for (unsigned int iter = 0; iter < 5; iter++)
     {
+      glm::vec4 tmp = this->projectionMatrix * this->viewMatrix * glm::vec4(light_pos[iter], 1.0f);
+      light_pos[iter] = glm::vec3(tmp.x, tmp.y, tmp.z);
       glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
       glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Position"), 1, glm::value_ptr(light_pos[iter]));
       glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Color"), 1, glm::value_ptr(light_color));
-      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Linear"), 0.05f);
-      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Quadratic"), 0.005f);
+      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Linear"), 0.01f);
+      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Quadratic"), 0.001f);
       glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].SpecExp"), 64.0f);
     }
     glBindVertexArray(this->quad_vao);

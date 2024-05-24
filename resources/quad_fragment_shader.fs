@@ -35,13 +35,13 @@ void main()
     {
     // Diffuse
     vec3 lightDir = normalize(lights[iter].Position - FragPos);
-    float diff = abs(dot(Normal, lightDir));
+    float diff = max(dot(Normal, lightDir), 0.0);
     vec3 diffuse = diff * lights[iter].Color * Albedo;
     // Specular
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, Normal);
     // vec3 tmpDir = normalize(lightDir + viewDir);
-    float spec = pow(abs(dot(viewDir, reflectDir)), lights[iter].SpecExp);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), lights[iter].SpecExp);
     vec3 specular = lights[iter].Color * spec * Specular;
     
     // Attenuation
