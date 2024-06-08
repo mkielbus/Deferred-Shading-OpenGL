@@ -13,7 +13,7 @@ Dla Windows potrzebne biblioteki są w folderze gkom_libs
 1. cd workingDir gdzie workingDir to katalog roboczy projektu z plikiem CMakeLists.txt
 2. cmake -S . -B buildDir -DINCLUDE_DIR=ścieżka/do/folderu/z/plikami/nagłówkowymi -DLIB_DIR=ścieżka/do/folderu/z/plikami/biliotek(.lib, .so) gdzie buildDir to ścieżka do katalogu, w którym ma zostać umieszczony plik Makefile (musi być umieszczony w podkatalogu katalogu zawierającego folder resources, najlepiej wykorzystać istniejący folder build w katalogu z CMakeLists.txt), ścieżki poszukiwanych katalogów mozna znaleźć używając sudo dpkg -L nazwa_biblioteki (libglfw3 lub libglew-dev lub libgl-dev)
 
-W przypadku systemu Windows należy użyć polecenia: cmake -S . -B build -DINCLUDE_DIR="pozostała_część_ścieżki/gkom_includes" -DLIB_DIR="pozostała_część_ścieżki/gkom_libs" -G "MinGW Makefiles"
+W przypadku systemu Windows należy użyć polecenia: cmake -S . -B build -DINCLUDE*DIR="pozostała_część*ścieżki/gkom*includes" -DLIB_DIR="pozostała_część*ścieżki/gkom_libs" -G "MinGW Makefiles"
 
 3. cd buildDir
 4. make
@@ -23,4 +23,4 @@ Na systemie Windows trzeba zadbać aby użyć polecenia make kompilującego proj
 ## Uruchomienie projektu
 
 1. cd buildDir
-2. ./gkom24l lub .\gkom24l.exe na systemie Windows
+2. ./gkom24l lub .\gkom24l.exe na systemie Windows, przy czym dodatkowo należy pamiętać o przekopiowania bibliotek \*.dll do folderu buildDir
