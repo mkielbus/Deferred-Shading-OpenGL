@@ -29,7 +29,7 @@ void main()
     float Specular = texture(gAlbedoSpec, TexCoords).a;
     
     // Ambient
-    vec3 ambient = 0.1 * Albedo;
+    vec3 ambient = 0.5 * Albedo;
 
     for(int iter = 0; iter < 5; iter++)
     {
@@ -51,7 +51,7 @@ void main()
     diffuse *= attenuation;
     specular *= attenuation;
 
-    ambient += diffuse + specular;
+    ambient += (diffuse + specular);
 
     }
 

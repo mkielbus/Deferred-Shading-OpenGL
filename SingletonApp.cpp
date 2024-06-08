@@ -30,45 +30,7 @@ std::string readShaderFile(std::string filePath)
   return content;
 }
 
-SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolution(glm::vec2(800, 600)), conf(std::string("#version 330 core\n") +
-                                                                                                                 std::string("layout (location = 0) in vec3 attrPosition;\n") +
-                                                                                                                 std::string("layout (location = 1) in vec3 attrColor;\n") +
-                                                                                                                 std::string("out vec3 fragColor;\n") +
-                                                                                                                 std::string("uniform mat4 uProjectionMatrix;\n") +
-                                                                                                                 std::string("uniform mat4 uViewMatrix;\n") +
-                                                                                                                 std::string("uniform mat4 uModelMatrix;\n") +
-                                                                                                                 std::string("void main()\n") +
-                                                                                                                 std::string("{\n") +
-                                                                                                                 std::string("    fragColor = attrColor;\n") +
-                                                                                                                 std::string("    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(attrPosition, 1.0);\n") +
-                                                                                                                 std::string("}\n"),
-                                                                                                             std::string("#version 330\n") +
-                                                                                                                 std::string("in vec3 fragColor;\n") +
-                                                                                                                 std::string("out vec4 finalColor;\n") +
-                                                                                                                 std::string("void main() {\n") +
-                                                                                                                 std::string("   finalColor = vec4(fragColor, 1.0);\n") +
-                                                                                                                 std::string("}\n")),
-                               texture_conf(std::string("#version 330 core\n") +
-                                                std::string("layout (location = 0) in vec3 attrPosition;\n") +
-                                                std::string("layout (location = 3) in vec2 attrTexCoord;\n") +
-                                                std::string("out vec2 texCoord;\n") +
-                                                std::string("uniform mat4 uProjectionMatrix;\n") +
-                                                std::string("uniform mat4 uViewMatrix;\n") +
-                                                std::string("uniform mat4 uModelMatrix;\n") +
-                                                std::string("uniform sampler2D uTexture;\n") +
-                                                std::string("void main()\n") +
-                                                std::string("{\n") +
-                                                std::string("    texCoord = attrTexCoord;\n") +
-                                                std::string("    gl_Position = uProjectionMatrix * uViewMatrix * uModelMatrix * vec4(attrPosition, 1.0);\n") +
-                                                std::string("}\n"),
-                                            std::string("#version 330\n") +
-                                                std::string("in vec2 texCoord;\n") +
-                                                std::string("out vec4 finalColor;\n") +
-                                                std::string("uniform sampler2D uTexture;\n") +
-                                                std::string("void main() {\n") +
-                                                std::string("   vec4 texColor = texture(uTexture, texCoord);\n") +
-                                                std::string("   finalColor = vec4(texColor.xyz, 1.0);\n") +
-                                                std::string("}\n")),
+SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolution(glm::vec2(800, 600)),
                                g_buffer_conf(readShaderFile("../resources/g_buffer_vertex_shader.vs"), readShaderFile("../resources/g_buffer_fragment_shader.fs")),
                                quad_conf(readShaderFile("../resources/quad_vertex_shader.vs"), readShaderFile("../resources/quad_fragment_shader.fs"))
 {
@@ -321,27 +283,6 @@ void SingletonApp::prepareVao(GLuint &vao)
   glBindVertexArray(0);
 }
 
-void SingletonApp::prepareEab(GLuint &eab)
-{
-  std::vector<GLshort> vertex_queue;
-  vertex_queue.push_back(0);
-  vertex_queue.push_back(1);
-  vertex_queue.push_back(2);
-  vertex_queue.push_back(3);
-  vertex_queue.push_back(4);
-  vertex_queue.push_back(5);
-  vertex_queue.push_back(6);
-  vertex_queue.push_back(7);
-  vertex_queue.push_back(8);
-  vertex_queue.push_back(9);
-  vertex_queue.push_back(10);
-  vertex_queue.push_back(11);
-  glGenBuffers(1, &eab);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, eab);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, vertex_queue.size() * sizeof(GLshort), vertex_queue.data(), GL_STATIC_DRAW);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
 void SingletonApp::processInput()
 {
   if (glfwGetKey(this->window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -420,6 +361,138 @@ void SingletonApp::processInput()
   }
 }
 
+void SingletonApp::prepareShaderUniforms()
+{
+  projectionMatrix = glm::perspective(glm::radians(fieldOfView), this->window_resolution.x / this->window_resolution.y, 0.1f, 100.0f);
+  viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
+  modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+  this->g_buffer_conf.enable();
+  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
+  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+  glUniform1i(this->g_buffer_conf.getUniformVarId("texture_diffuse1"), 0);
+  glUniform1i(this->g_buffer_conf.getUniformVarId("texture_specular1"), 1);
+  this->g_buffer_conf.disable();
+  this->quad_conf.enable();
+  glUniform1i(this->quad_conf.getUniformVarId("gPosition"), 0);
+  glUniform1i(this->quad_conf.getUniformVarId("gNormal"), 1);
+  glUniform1i(this->quad_conf.getUniformVarId("gAlbedoSpec"), 2);
+  this->quad_conf.disable();
+}
+
+void SingletonApp::renderSceneToGbuffer()
+{
+  this->g_buffer.Clear();
+  this->g_buffer.Activate();
+  this->g_buffer_conf.enable();
+  glBindVertexArray(this->vao);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, this->texture_floor);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, this->texture_floor);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, this->texture_wall);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, this->texture_wall);
+  glDrawArrays(GL_TRIANGLES, 6, 24);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
+  glDrawArrays(GL_TRIANGLES, 30, 6);
+  glBindVertexArray(0);
+  this->g_buffer_conf.disable();
+  this->g_buffer.Deactivate();
+}
+
+void SingletonApp::renderSceneObjectsToGbuffer()
+{
+  this->g_buffer.Activate();
+  this->g_buffer_conf.enable();
+  glBindVertexArray(this->vao);
+  for (int i = -10; i <= 10; i = i + 10)
+  {
+    for (int j = -10; j <= 10; j = j + 10)
+    {
+      this->g_buffer_conf.enable();
+      glm::mat4 model = glm::mat4(1.0f);
+      model = glm::translate(model, glm::vec3(2.0f + j, 0.01f, 0.0f + i));
+      model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
+      modelMatrix = model;
+      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+      glDrawArrays(GL_TRIANGLES, 36, 36);
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, glm::vec3(-1.0f + j, 0.01f, 0.0f + i));
+      model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+      model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
+      modelMatrix = model;
+      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
+      glDrawArrays(GL_TRIANGLES, 36, 36);
+      model = glm::mat4(1.0f);
+      model = glm::translate(model, glm::vec3(0.5f + j, 4.0f, 0.0f + i));
+      model = glm::scale(model, glm::vec3(1.0f / 5.0f, 1.0f / 15.0f, 1.0f / 20.0f));
+      modelMatrix = model;
+      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+      glActiveTexture(GL_TEXTURE0);
+      glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
+      glActiveTexture(GL_TEXTURE1);
+      glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
+      glDrawArrays(GL_TRIANGLES, 36, 36);
+      glBindTexture(GL_TEXTURE_2D, 0);
+      glActiveTexture(0);
+      this->g_buffer_conf.disable();
+    }
+  }
+  glBindVertexArray(0);
+  this->g_buffer_conf.disable();
+  this->g_buffer.Deactivate();
+}
+
+void SingletonApp::prepareDataForQuadRendering()
+{
+  this->quad_conf.enable();
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(0));
+  glActiveTexture(GL_TEXTURE1);
+  glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(1));
+  glActiveTexture(GL_TEXTURE2);
+  glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
+  glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
+  glm::vec3 light_pos[5] = {glm::vec3(0.0f, 10.0f, 19.0f), glm::vec3(-19.0f, 10.0f, 0.0f), glm::vec3(19.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, -19.0f), glm::vec3(0.0f, 19.0f, 0.0f)};
+  // glm::vec3 light_pos[1] = {glm::vec3(0.0f, 19.5f, 0.0f)};
+  for (unsigned int iter = 0; iter < 5; iter++)
+  {
+    glm::vec4 tmp = this->projectionMatrix * this->viewMatrix * glm::vec4(light_pos[iter], 1.0f);
+    light_pos[iter] = glm::vec3(tmp.x, tmp.y, tmp.z);
+    glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+    glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Position"), 1, glm::value_ptr(light_pos[iter]));
+    glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Color"), 1, glm::value_ptr(light_color));
+    glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Linear"), 0.01f);
+    glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Quadratic"), 0.001f);
+    glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].SpecExp"), 64.0f);
+  }
+  this->quad_conf.disable();
+}
+
+void SingletonApp::renderQuad()
+{
+  this->quad_conf.enable();
+  glBindVertexArray(this->quad_vao);
+  glDrawArrays(GL_TRIANGLES, 0, 6);
+  glBindVertexArray(0);
+  this->quad_conf.disable();
+}
+
 void SingletonApp::execute()
 {
   glEnable(GL_DEPTH_TEST);
@@ -428,127 +501,13 @@ void SingletonApp::execute()
   while (!glfwWindowShouldClose(this->window))
   {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    projectionMatrix = glm::perspective(glm::radians(fieldOfView), this->window_resolution.x / this->window_resolution.y, 0.1f, 100.0f);
-    viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
-    modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
-    this->conf.enable();
-    glUniformMatrix4fv(this->conf.getUniformVarId("uViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(this->conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-    glUniformMatrix4fv(this->conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-    this->conf.disable();
-    this->texture_conf.enable();
-    glUniformMatrix4fv(this->texture_conf.getUniformVarId("uViewMatrix"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(this->texture_conf.getUniformVarId("uProjectionMatrix"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-    glUniformMatrix4fv(this->texture_conf.getUniformVarId("uModelMatrix"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-    glUniform1i(this->texture_conf.getUniformVarId("uTexture"), 0);
-    this->texture_conf.disable();
-    this->g_buffer_conf.enable();
-    glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-    glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-    glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-    glUniform1i(this->g_buffer_conf.getUniformVarId("texture_diffuse1"), 0);
-    glUniform1i(this->g_buffer_conf.getUniformVarId("texture_specular1"), 1);
-    this->g_buffer_conf.disable();
-    this->quad_conf.enable();
-    glUniform1i(this->quad_conf.getUniformVarId("gPosition"), 0);
-    glUniform1i(this->quad_conf.getUniformVarId("gNormal"), 1);
-    glUniform1i(this->quad_conf.getUniformVarId("gAlbedoSpec"), 2);
-    this->quad_conf.disable();
-    // this->texture_conf.enable();
-    this->g_buffer.Clear();
-    this->g_buffer.Activate();
-    this->g_buffer_conf.enable();
-    glBindVertexArray(this->vao);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->texture_floor);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, this->texture_floor);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->texture_wall);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, this->texture_wall);
-    glDrawArrays(GL_TRIANGLES, 6, 24);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, this->texture_ceiling);
-    glDrawArrays(GL_TRIANGLES, 30, 6);
-    // this->texture_conf.disable();
-    this->g_buffer_conf.disable();
-    for (int i = -10; i <= 10; i = i + 10)
-    {
-      for (int j = -10; j <= 10; j = j + 10)
-      {
-        // this->texture_conf.enable();
-        this->g_buffer_conf.enable();
-        glm::mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(2.0f + j, 0.01f, 0.0f + i));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
-        modelMatrix = model;
-        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glDrawArrays(GL_TRIANGLES, 36, 36);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(-1.0f + j, 0.01f, 0.0f + i));
-        model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
-        modelMatrix = model;
-        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
-        glDrawArrays(GL_TRIANGLES, 36, 36);
-        model = glm::mat4(1.0f);
-        model = glm::translate(model, glm::vec3(0.5f + j, 4.0f, 0.0f + i));
-        model = glm::scale(model, glm::vec3(1.0f / 5.0f, 1.0f / 15.0f, 1.0f / 20.0f));
-        modelMatrix = model;
-        glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
-        glDrawArrays(GL_TRIANGLES, 36, 36);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        glActiveTexture(0);
-        // this->texture_conf.disable();
-        this->g_buffer_conf.disable();
-      }
-    }
-    this->g_buffer.Deactivate();
-    glBindVertexArray(0);
+    this->prepareShaderUniforms();
+    this->renderSceneToGbuffer();
+    this->renderSceneObjectsToGbuffer();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glViewport(0, 0, (GLsizei)this->window_resolution.x, (GLsizei)this->window_resolution.y);
-    this->quad_conf.enable();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(0));
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(1));
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
-    glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-    glm::vec3 light_pos[5] = {glm::vec3(0.0f, 10.0f, 19.0f), glm::vec3(-19.0f, 10.0f, 0.0f), glm::vec3(19.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, -19.0f), glm::vec3(0.0f, 19.0f, 0.0f)};
-    // glm::vec3 light_pos[1] = {glm::vec3(0.0f, 19.5f, 0.0f)};
-    for (unsigned int iter = 0; iter < 5; iter++)
-    {
-      glm::vec4 tmp = this->projectionMatrix * this->viewMatrix * glm::vec4(light_pos[iter], 1.0f);
-      light_pos[iter] = glm::vec3(tmp.x, tmp.y, tmp.z);
-      glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
-      glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Position"), 1, glm::value_ptr(light_pos[iter]));
-      glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Color"), 1, glm::value_ptr(light_color));
-      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Linear"), 0.01f);
-      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Quadratic"), 0.001f);
-      glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].SpecExp"), 64.0f);
-    }
-    glBindVertexArray(this->quad_vao);
-    glDrawArrays(GL_TRIANGLES, 0, 6);
-    glBindVertexArray(0);
-    this->quad_conf.disable();
+    this->prepareDataForQuadRendering();
+    this->renderQuad();
     this->processInput();
     glfwSwapBuffers(this->window);
     glfwPollEvents();
@@ -619,16 +578,6 @@ void SingletonApp::prepareTexture(GLuint &texture, std::string filepath, GLint p
 bool SingletonApp::prepareScene()
 {
   bool status;
-  status = this->conf.init();
-  if (!status)
-  {
-    return false;
-  }
-  status = this->texture_conf.init();
-  if (!status)
-  {
-    return false;
-  }
   status = this->g_buffer_conf.init();
   if (!status)
   {
@@ -644,7 +593,6 @@ bool SingletonApp::prepareScene()
   // this->prepareCircle(buffer);
   this->prepareVbo(buffer, this->vbo);
   this->prepareVao(this->vao);
-  // this->prepareEab(this->eab);
   this->prepareTexture(this->texture, "../resources/box.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_wall, "../resources/wall.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_floor, "../resources/floor.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
@@ -713,8 +661,5 @@ void SingletonApp::mouseCallback(GLFWwindow *window, double xpos, double ypos)
 
 SingletonApp::~SingletonApp()
 {
-  // glDeleteVertexArrays(1, &this->vao);
-  // glDeleteBuffers(1, &this->vbo);
-  // glDeleteBuffers(1, &this->eab);
   glfwTerminate();
 }

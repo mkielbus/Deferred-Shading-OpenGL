@@ -16,10 +16,9 @@ private:
   GLFWwindow *window;
   GLuint vao;
   GLuint vbo;
-  GLuint eab;
+  ShadersConf g_buffer_conf;
+  ShadersConf quad_conf;
   glm::vec2 window_resolution;
-  ShadersConf conf;
-  ShadersConf texture_conf;
   GLuint texture;
   GLuint texture_floor;
   GLuint texture_wall;
@@ -44,18 +43,20 @@ private:
   GLuint quad_vao;
   GLuint quad_vbo;
   Framebuffer g_buffer;
-  ShadersConf g_buffer_conf;
-  ShadersConf quad_conf;
   void prepareCuboid(std::vector<Vertex> &buffer);
   void prepareCircle(std::vector<Vertex> &buffer);
   void prepareQuad(std::vector<Vertex> &buffer);
   void prepareVbo(const std::vector<Vertex> &buffer, GLuint &vbo);
   void prepareVao(GLuint &vao);
-  void prepareEab(GLuint &eab);
   void processInput();
   void prepareTexture(GLuint &texture, std::string filepath, GLint paramWrapS, GLint paramWrapT, GLint paramMinFilter, GLuint paramMagFilter);
   void processMouse(float xoffset, float yoffset);
   void handleMouseMovement(GLFWwindow *window, double xpos, double ypos);
+  void prepareShaderUniforms();
+  void renderSceneToGbuffer();
+  void renderSceneObjectsToGbuffer();
+  void prepareDataForQuadRendering();
+  void renderQuad();
 
 public:
   SingletonApp(
