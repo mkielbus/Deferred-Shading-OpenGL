@@ -14,7 +14,7 @@ if(WIN32)
     find_library(GLEW_LIB NAMES glew32 PATHS ${LIB_DIR} REQUIRED)
     find_library(GLFW3_LIB NAMES glfw3 PATHS ${LIB_DIR} REQUIRED)
     find_library(GLEWS_LIB NAMES glew32s PATHS ${LIB_DIR} REQUIRED)
-find_library(GL_LIB NAMES opengl32 PATHS ${LIB_DIR} REQUIRED)
+    find_library(GL_LIB NAMES opengl32 PATHS ${LIB_DIR} REQUIRED)
 
     target_link_libraries(gkom24l PRIVATE ${GLEW_LIB} ${GLFW3_LIB} ${GLEWS_LIB} ${GL_LIB})
 elseif(UNIX)

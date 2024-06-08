@@ -72,7 +72,6 @@ bool SingletonApp::prepareWindow()
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-  // Get the primary monitor
   GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
   if (!primaryMonitor)
   {
@@ -81,7 +80,6 @@ bool SingletonApp::prepareWindow()
     return -1;
   }
 
-  // Get video mode of the primary monitor
   const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
   if (!mode)
   {
@@ -95,7 +93,6 @@ bool SingletonApp::prepareWindow()
   int screenHeight = mode->height;
   this->window_resolution.y = screenHeight;
 
-  // Utwórz okno
   this->window = glfwCreateWindow(screenWidth, screenHeight, "Scena 3D", nullptr, nullptr);
   if (!window)
   {
@@ -104,10 +101,8 @@ bool SingletonApp::prepareWindow()
     return false;
   }
 
-  // Ustaw kontekst OpenGL dla okna
   glfwMakeContextCurrent(window);
 
-  // Inicjalizacja GLEW
   if (glewInit() != GLEW_OK)
   {
     std::cerr << "Błąd inicjalizacji GLEW" << std::endl;
