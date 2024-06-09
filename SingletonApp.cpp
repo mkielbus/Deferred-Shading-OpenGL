@@ -34,10 +34,10 @@ SingletonApp::SingletonApp() : window(nullptr), vao(0), vbo(0), window_resolutio
                                g_buffer_conf(readShaderFile("../resources/g_buffer_vertex_shader.vs"), readShaderFile("../resources/g_buffer_fragment_shader.fs")),
                                quad_conf(readShaderFile("../resources/quad_vertex_shader.vs"), readShaderFile("../resources/quad_fragment_shader.fs"))
 {
-  fieldOfView = 45;
-  cameraPosition = glm::vec3(0, 10, 19);
-  cameraDirection = glm::vec3(0, 0, -1);
-  cameraUp = glm::vec3(0, 1, 0);
+    field_of_view = 45;
+    camera_position = glm::vec3(0, 10, 19);
+    camera_direction = glm::vec3(0, 0, -1);
+    camera_up = glm::vec3(0, 1, 0);
   cameraSpeed = 0.05f;
   this->first_mouse_movement = true;
   this->mouse_sensitivity = 0.2f;
@@ -60,14 +60,11 @@ void FrameBufferSizeChangeCallbackFunction(GLFWwindow *window, int width, int he
 
 bool SingletonApp::prepareWindow()
 {
-  // Inicjalizacja GLFW
   if (!glfwInit())
   {
-    std::cerr << "Błąd inicjalizacji GLFW" << std::endl;
     return false;
   }
 
-  // Konfiguracja GLFW
   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
   glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -75,7 +72,6 @@ bool SingletonApp::prepareWindow()
   GLFWmonitor *primaryMonitor = glfwGetPrimaryMonitor();
   if (!primaryMonitor)
   {
-    std::cerr << "Failed to get the primary monitor" << std::endl;
     glfwTerminate();
     return -1;
   }
@@ -83,7 +79,6 @@ bool SingletonApp::prepareWindow()
   const GLFWvidmode *mode = glfwGetVideoMode(primaryMonitor);
   if (!mode)
   {
-    std::cerr << "Failed to get the video mode of the primary monitor" << std::endl;
     glfwTerminate();
     return -1;
   }
@@ -96,7 +91,6 @@ bool SingletonApp::prepareWindow()
   this->window = glfwCreateWindow(screenWidth, screenHeight, "Scena 3D", nullptr, nullptr);
   if (!window)
   {
-    std::cerr << "Błąd tworzenia okna GLFW" << std::endl;
     glfwTerminate();
     return false;
   }
@@ -105,7 +99,6 @@ bool SingletonApp::prepareWindow()
 
   if (glewInit() != GLEW_OK)
   {
-    std::cerr << "Błąd inicjalizacji GLEW" << std::endl;
     glfwTerminate();
     return false;
   }
@@ -290,43 +283,43 @@ void SingletonApp::processInput()
   if (glfwGetKey(this->window, GLFW_KEY_W) == GLFW_PRESS)
   {
     // Move forward
-    cameraPosition.z -= cameraSpeed;
-    cameraPosition.z = std::max(cameraPosition.z, -19.0f);
+    camera_position.z -= cameraSpeed;
+      camera_position.z = std::max(camera_position.z, -19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_S) == GLFW_PRESS)
   {
     // Move backward
-    cameraPosition.z += cameraSpeed;
-    cameraPosition.z = std::min(cameraPosition.z, 19.0f);
+    camera_position.z += cameraSpeed;
+      camera_position.z = std::min(camera_position.z, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_A) == GLFW_PRESS)
   {
     // Move left
-    cameraPosition.x -= cameraSpeed;
-    cameraPosition.x = std::max(cameraPosition.x, -19.0f);
+    camera_position.x -= cameraSpeed;
+      camera_position.x = std::max(camera_position.x, -19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_D) == GLFW_PRESS)
   {
     // Move right
-    cameraPosition.x += cameraSpeed;
-    cameraPosition.x = std::min(cameraPosition.x, 19.0f);
+    camera_position.x += cameraSpeed;
+      camera_position.x = std::min(camera_position.x, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_Q) == GLFW_PRESS)
   {
     // Move up
-    cameraPosition.y += cameraSpeed;
-    cameraPosition.y = std::min(cameraPosition.y, 19.0f);
+    camera_position.y += cameraSpeed;
+      camera_position.y = std::min(camera_position.y, 19.0f);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_E) == GLFW_PRESS)
   {
     // Move down
-    cameraPosition.y -= cameraSpeed;
-    cameraPosition.y = std::max(cameraPosition.y, 1.0f);
+    camera_position.y -= cameraSpeed;
+      camera_position.y = std::max(camera_position.y, 1.0f);
   }
 
   // Camera direction
@@ -334,37 +327,37 @@ void SingletonApp::processInput()
   if (glfwGetKey(this->window, GLFW_KEY_1) == GLFW_PRESS)
   {
     // Look forward
-    cameraDirection = glm::vec3(0, 0, -1);
+    camera_direction = glm::vec3(0, 0, -1);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_2) == GLFW_PRESS)
   {
     // Look backward
-    cameraDirection = glm::vec3(0, 0, 1);
+    camera_direction = glm::vec3(0, 0, 1);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_3) == GLFW_PRESS)
   {
     // Look left
-    cameraDirection = glm::vec3(-1, 0, 0);
+    camera_direction = glm::vec3(-1, 0, 0);
   }
 
   if (glfwGetKey(this->window, GLFW_KEY_4) == GLFW_PRESS)
   {
     // Look right
-    cameraDirection = glm::vec3(1, 0, 0);
+    camera_direction = glm::vec3(1, 0, 0);
   }
 }
 
 void SingletonApp::prepareShaderUniforms()
 {
-  projectionMatrix = glm::perspective(glm::radians(fieldOfView), this->window_resolution.x / this->window_resolution.y, 0.1f, 100.0f);
-  viewMatrix = glm::lookAt(cameraPosition, cameraPosition + cameraDirection, cameraUp);
-  modelMatrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    projection_matrix = glm::perspective(glm::radians(field_of_view), this->window_resolution.x / this->window_resolution.y, 0.1f, 100.0f);
+    view_matrix = glm::lookAt(camera_position, camera_position + camera_direction, camera_up);
+    model_matrix = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
   this->g_buffer_conf.enable();
-  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("view"), 1, GL_FALSE, glm::value_ptr(viewMatrix));
-  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("projection"), 1, GL_FALSE, glm::value_ptr(projectionMatrix));
-  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("view"), 1, GL_FALSE, glm::value_ptr(view_matrix));
+  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("projection"), 1, GL_FALSE, glm::value_ptr(projection_matrix));
+  glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(model_matrix));
   glUniform1i(this->g_buffer_conf.getUniformVarId("texture_diffuse1"), 0);
   glUniform1i(this->g_buffer_conf.getUniformVarId("texture_specular1"), 1);
   this->g_buffer_conf.disable();
@@ -415,8 +408,8 @@ void SingletonApp::renderSceneObjectsToGbuffer()
       model = glm::translate(model, glm::vec3(2.0f + j, 0.01f, 0.0f + i));
       model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
-      modelMatrix = model;
-      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        model_matrix = model;
+      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(model_matrix));
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
       glActiveTexture(GL_TEXTURE1);
@@ -426,8 +419,8 @@ void SingletonApp::renderSceneObjectsToGbuffer()
       model = glm::translate(model, glm::vec3(-1.0f + j, 0.01f, 0.0f + i));
       model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
       model = glm::scale(model, glm::vec3(1.0f / 30.0f, 1.0f / 5.0f, 1.0f / 25.0f));
-      modelMatrix = model;
-      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        model_matrix = model;
+      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(model_matrix));
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_bottom);
       glActiveTexture(GL_TEXTURE1);
@@ -436,8 +429,8 @@ void SingletonApp::renderSceneObjectsToGbuffer()
       model = glm::mat4(1.0f);
       model = glm::translate(model, glm::vec3(0.5f + j, 4.0f, 0.0f + i));
       model = glm::scale(model, glm::vec3(1.0f / 5.0f, 1.0f / 15.0f, 1.0f / 20.0f));
-      modelMatrix = model;
-      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(modelMatrix));
+        model_matrix = model;
+      glUniformMatrix4fv(this->g_buffer_conf.getUniformVarId("model"), 1, GL_FALSE, glm::value_ptr(model_matrix));
       glActiveTexture(GL_TEXTURE0);
       glBindTexture(GL_TEXTURE_2D, this->texture_obstacle_up);
       glActiveTexture(GL_TEXTURE1);
@@ -462,19 +455,18 @@ void SingletonApp::prepareDataForQuadRendering()
   glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(1));
   glActiveTexture(GL_TEXTURE2);
   glBindTexture(GL_TEXTURE_2D, this->g_buffer.GetTexture(2));
-  glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->cameraPosition));
-  glm::vec3 light_pos[5] = {glm::vec3(0.0f, 10.0f, 19.0f), glm::vec3(-19.0f, 10.0f, 0.0f), glm::vec3(19.0f, 10.0f, 0.0f), glm::vec3(0.0f, 10.0f, -19.0f), glm::vec3(0.0f, 19.0f, 0.0f)};
-  // glm::vec3 light_pos[1] = {glm::vec3(0.0f, 19.5f, 0.0f)};
+  glUniform3fv(this->quad_conf.getUniformVarId("viewPos"), 1, glm::value_ptr(this->camera_position));
+  glm::vec3 light_pos[5] = {glm::vec3(-9.5f, 1.0f, 10.0f), glm::vec3(9.5f, 1.0f, 10.0f), glm::vec3(-9.5f, 1.0f, -10.0f), glm::vec3(9.5f, 1.0f, -10.0f), glm::vec3(0.0f, 19.0f, 0.0f)};
   for (unsigned int iter = 0; iter < 5; iter++)
   {
-    glm::vec4 tmp = this->projectionMatrix * this->viewMatrix * glm::vec4(light_pos[iter], 1.0f);
+    glm::vec4 tmp = this->projection_matrix * this->view_matrix * glm::vec4(light_pos[iter], 1.0f);
     light_pos[iter] = glm::vec3(tmp.x, tmp.y, tmp.z);
     glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
     glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Position"), 1, glm::value_ptr(light_pos[iter]));
     glUniform3fv(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Color"), 1, glm::value_ptr(light_color));
     glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Linear"), 0.01f);
     glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].Quadratic"), 0.001f);
-    glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].SpecExp"), 64.0f);
+    glUniform1f(this->quad_conf.getUniformVarId("lights[" + std::to_string(iter) + "].SpecExp"), 16.0f);
   }
   this->quad_conf.disable();
 }
@@ -588,7 +580,6 @@ bool SingletonApp::prepareScene()
   // this->prepareCircle(buffer);
   this->prepareVbo(buffer, this->vbo);
   this->prepareVao(this->vao);
-  this->prepareTexture(this->texture, "../resources/box.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_wall, "../resources/wall.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_floor, "../resources/floor.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
   this->prepareTexture(this->texture_ceiling, "../resources/ceiling.png", GL_REPEAT, GL_REPEAT, GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR);
@@ -603,7 +594,6 @@ bool SingletonApp::prepareScene()
   g_buffer.SetAttachmentTexture(0, GL_RGB, GL_FLOAT);
   g_buffer.SetAttachmentTexture(1, GL_RGB, GL_FLOAT);
   g_buffer.SetAttachmentTexture(2, GL_RGBA, GL_UNSIGNED_BYTE);
-  // framebuffer.SetAttachmentDepth(GL_DEPTH_COMPONENT24);
   g_buffer.SetDrawBuffers({0, 1, 2});
   g_buffer.Deactivate();
   return true;
@@ -625,7 +615,7 @@ void SingletonApp::processMouse(float xoffset, float yoffset)
   front.x = sin(glm::radians(this->theta)) * cos(glm::radians(this->phi));
   front.y = cos(glm::radians(this->theta));
   front.z = sin(glm::radians(this->theta)) * sin(glm::radians(this->phi));
-  this->cameraDirection = glm::normalize(front);
+  this->camera_direction = glm::normalize(front);
   // this->right = glm::normalize(glm::cross(this->cameraDirection, this->cameraUp));
   // this->cameraUp = glm::normalize(glm::cross(this->right, this->cameraDirection));
 }

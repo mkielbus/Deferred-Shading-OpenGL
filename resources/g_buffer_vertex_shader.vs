@@ -14,9 +14,6 @@ uniform mat4 projection;
 
 void main()
 {
-    //vec4 transformedPos = model * vec4(aPos, 1.0);
-    //FragPos = transformedPos.xyz;
-    //Normal = transpose(inverse(mat3(model))) * aNormal;
     FragPos = projection * view * model * vec4(aPos, 1.0);
     Normal = mat3(transpose(inverse(view * model))) * aNormal;
     TexCoords = aTexCoords;
