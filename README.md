@@ -23,4 +23,4 @@ Na systemie Windows trzeba zadbać aby użyć polecenia make kompilującego proj
 ## Uruchomienie projektu
 
 1. cd buildDir
-2. ./gkom24l lub .\gkom24l.exe na systemie Windows, przy czym dodatkowo należy pamiętać o przekopiowania bibliotek \*.dll do folderu buildDir
+2. ./gkom24l lub .\gkom24l.exe na systemie Windows, przy czym dodatkowo należy pamiętać o przekopiowaniu bibliotek \*.dll do folderu buildDir
